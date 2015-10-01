@@ -171,11 +171,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long durationMinutes = duration / (60 * 1000) % 60;
             long durationHours = duration / (60 * 60 * 1000) % 24;
             long durationDays = duration / (24 * 60 * 60 * 1000);
-    		if(MainFrame.properties.getProperty("language").equals("enUS"))
+    		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 return dataset.getColumnKey(column) + ", " + durationDays + " days " + durationHours + " hours " + durationMinutes + " mins";
     		}
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 return dataset.getColumnKey(column) + "，" + durationDays + "天" + durationHours + "小时" + durationMinutes + "分";
     		}
@@ -351,6 +351,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 	static JButton casesButton;
 	static JTextField separatorText;
 	static JCheckBox tableHead;
+	static JComboBox<String> encoding;
 
 	public StaticsPanel() {
 		// TODO Auto-generated constructor stub
@@ -399,7 +400,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewMeanWaitingTimeChartPanel.setReshowDelay(0);
 		
         overviewChartPanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        overviewChartPanel.addTab("Events over time", null, overviewEventsOverTimeChartPanel, "Events over time");
 	        overviewChartPanel.addTab("Active cases over time", null, overviewActiveCasesOverTimeChartPanel, "Active cases over time");
@@ -410,7 +411,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 	        overviewChartPanel.addTab("Mean activity duration", null, overviewMeanActivityDurationChartPanel, "Mean activity duration");
 	        overviewChartPanel.addTab("Mean waiting time", null, overviewMeanWaitingTimeChartPanel, "Mean waiting time");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        overviewChartPanel.addTab("事件分布图", null, overviewEventsOverTimeChartPanel, "事件分布图");
 	        overviewChartPanel.addTab("实例分布图", null, overviewActiveCasesOverTimeChartPanel, "实例分布图");
@@ -461,12 +462,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewVariantTable = new JTable();
 		overviewVariantTablePanel = new JScrollPane(overviewVariantTable);
         overviewTablePanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 			overviewTablePanel.addTab("Cases (" + MainFrame.caseCollection.getSize() + ")", null, overviewCaseTablePanel, "Cases");
 			overviewTablePanel.addTab("Variants (" + MainFrame.variantCollection.getSize() + ")", null, overviewVariantTablePanel, "Variants");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			overviewTablePanel.addTab("实例(" + MainFrame.caseCollection.getSize() + ")", null, overviewCaseTablePanel, "实例");
 			overviewTablePanel.addTab("实例种类(" + MainFrame.variantCollection.getSize() + ")", null, overviewVariantTablePanel, "实例种类");
@@ -503,7 +504,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 		activityAggregateDurationChartPanel.setReshowDelay(0);
 		
         activityChartPanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        activityChartPanel.addTab("Frequency", null, activityFrequencyChartPanel, "Frequency");
 	        activityChartPanel.addTab("Median duration", null, activityMedianDurationChartPanel, "Median duration");
@@ -511,7 +512,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 	        activityChartPanel.addTab("Duration range", null, activityDurationRangeChartPanel, "Duration range");
 	        activityChartPanel.addTab("Aggregate duration", null, activityAggregateDurationChartPanel, "Aggregate duration");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        activityChartPanel.addTab("活动频度图", null, activityFrequencyChartPanel, "活动频度图");
 	        activityChartPanel.addTab("中位时间图", null, activityMedianDurationChartPanel, "中位时间图");
@@ -557,13 +558,13 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         activityLastInCaseTable = new JTable();
         activityLastInCaseTablePanel = new JScrollPane(activityLastInCaseTable);
         activityTablePanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        activityTablePanel.addTab("All activities (" + MainFrame.activityCollection.getSize() + ")", null, activityAllActivitiesTablePanel, "All activities");
 	        activityTablePanel.addTab("First in case (" + MainFrame.activityCollection.getFirst() + ")", null, activityFirstInCaseTablePanel, "First in case");
 	        activityTablePanel.addTab("Last in case (" + MainFrame.activityCollection.getLast() + ")", null, activityLastInCaseTablePanel, "Last in case");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        activityTablePanel.addTab("所有活动(" + MainFrame.activityCollection.getSize() + ")", null, activityAllActivitiesTablePanel, "所有活动");
 	        activityTablePanel.addTab("开始活动(" + MainFrame.activityCollection.getFirst() + ")", null, activityFirstInCaseTablePanel, "开始活动");
@@ -601,7 +602,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceAggregateDurationChartPanel.setReshowDelay(0);
         
         resourceChartPanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        resourceChartPanel.addTab("Frequency", null, resourceFrequencyChartPanel, "Frequency");
 	        resourceChartPanel.addTab("Median duration", null, resourceMedianDurationChartPanel, "Median duration");
@@ -609,7 +610,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 	        resourceChartPanel.addTab("Duration range", null, resourceDurationRangeChartPanel, "Duration range");
 	        resourceChartPanel.addTab("Aggregate duration", null, resourceAggregateDurationChartPanel, "Aggregate duration");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			resourceChartPanel.addTab("资源频度图", null, resourceFrequencyChartPanel, "资源频度图");
 			resourceChartPanel.addTab("中位时间图", null, resourceMedianDurationChartPanel, "中位时间图");
@@ -655,13 +656,13 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceLastInCaseTable = new JTable();
         resourceLastInCaseTablePanel = new JScrollPane(resourceLastInCaseTable);
         resourceTablePanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        resourceTablePanel.addTab("All resources (" + MainFrame.resourceCollection.getSize() + ")", null, resourceAllResourcesTablePanel, "All resources");
 	        resourceTablePanel.addTab("First in case (" + MainFrame.resourceCollection.getFirst() + ")", null, resourceFirstInCaseTablePanel, "First in case");
 	        resourceTablePanel.addTab("Last in case (" + MainFrame.resourceCollection.getLast() + ")", null, resourceLastInCaseTablePanel, "Last in case");
 	 	}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        resourceTablePanel.addTab("所有资源(" + MainFrame.resourceCollection.getSize() + ")", null, resourceAllResourcesTablePanel, "所有资源");
 	        resourceTablePanel.addTab("开始资源(" + MainFrame.resourceCollection.getFirst() + ")", null, resourceFirstInCaseTablePanel, "开始资源");
@@ -673,36 +674,36 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourcePanel.add(resourceStaticPanel, BorderLayout.NORTH);
 		
 //		tabbedPanel = new JTabbedPane(JTabbedPane.LEFT);
-//		if(MainFrame.properties.getProperty("language").equals("enUS"))
+//		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 //		{
 //	        tabbedPanel.addTab(null, new VerticalTextIcon("  Overview  ", false), overviewPanel, "Global Statics");
 //	        tabbedPanel.addTab(null, new VerticalTextIcon("  Activity  ", false), activityPanel, "Activity Classes");
 //	        tabbedPanel.addTab(null, new VerticalTextIcon("  Resource  ", false), resourcePanel, "Resource Classes");
 //	 	}
-//		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+//		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 //		{
 //	        tabbedPanel.addTab(null, new VerticalTextIcon("  全局  ", false), overviewPanel, "全局统计");
 //	        tabbedPanel.addTab(null, new VerticalTextIcon("  活动  ", false), activityPanel, "活动统计");
 //	        tabbedPanel.addTab(null, new VerticalTextIcon("  资源  ", false), resourcePanel, "资源统计");
 //	 	}
         tabbedPanel = new JTabbedPane();
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        tabbedPanel.addTab("Overview", null, overviewPanel, "Global Statics");
 	        tabbedPanel.addTab("Activity", null, activityPanel, "Activity Classes");
 	        tabbedPanel.addTab("Resource", null, resourcePanel, "Resource Classes");	 	}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        tabbedPanel.addTab("全局", null, overviewPanel, "全局统计");
 	        tabbedPanel.addTab("活动", null, activityPanel, "活动统计");
 	        tabbedPanel.addTab("资源", null, resourcePanel, "资源统计");
 	 	}
         
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 			fileButton = new JButton("Select csv");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			fileButton = new JButton("选择csv文件");
 		}
@@ -714,12 +715,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 				fd.setAcceptAllFileFilterUsed(false);
 				final String[][] fileENames;
 				fileENames = new String[1][2];
-				if(MainFrame.properties.getProperty("language").equals("enUS"))
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
 					fileENames[0][0] = ".csv";
 					fileENames[0][1] = "Csv files(*.csv)";
 				}
-				else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
 					fileENames[0][0] = ".csv";
 					fileENames[0][1] = "Csv文件(*.csv)";
@@ -730,11 +731,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 					}
 
 					public String getDescription() {
-						if(MainFrame.properties.getProperty("language").equals("enUS"))
+						if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 						{
 							return "All files(*.*)";
 						}
-						else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+						else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 						{
 							return "所有文件(*.*)";
 						}
@@ -783,7 +784,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                     
                     MainFrame.mainFrame.getContentPane().removeAll();
                     System.gc();
-					ImportPanel importPanel = new ImportPanel(file.getAbsolutePath(), separatorText.getText().charAt(0), tableHead.isSelected());
+                    ImportPanel importPanel = new ImportPanel(file.getAbsolutePath(), separatorText.getText().charAt(0), tableHead.isSelected(), encoding.getItemAt(encoding.getSelectedIndex()));
                     MainFrame.mainFrame.setContentPane(importPanel);
                     MainFrame.mainFrame.setVisible(true);
                     System.gc();
@@ -792,11 +793,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         });
 
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        mapButton = new JButton("Map");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        mapButton = new JButton("示意图");
 		}
@@ -812,11 +813,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         });
       
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        staticsButton = new JButton("Statics");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        staticsButton = new JButton("统计");
 	    }
@@ -832,11 +833,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         });
         
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        casesButton = new JButton("Cases");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        casesButton = new JButton("实例");
 	    }
@@ -852,33 +853,71 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         });
         
+		String[] boxString = {"Big5", "Big5-HKSCS", "CESU-8", "EUC-JP", "EUC-KR", "GB18030", "GB2312",
+				"GBK", "IBM-Thai", "IBM00858", "IBM01140", "IBM01141", "IBM01142", "IBM01143", "IBM01144",
+				"IBM01145", "IBM01146", "IBM01147", "IBM01148", "IBM01149", "IBM037", "IBM1026", "IBM1047",
+				"IBM273", "IBM277", "IBM278", "IBM280", "IBM284", "IBM285", "IBM290", "IBM297", "IBM420",
+				"IBM424", "IBM437", "IBM500", "IBM775", "IBM850", "IBM852", "IBM855", "IBM857", "IBM860",
+				"IBM861", "IBM862", "IBM863", "IBM864", "IBM865", "IBM866", "IBM868", "IBM869", "IBM870",
+				"IBM871", "IBM918", "ISO-2022-CN", "ISO-2022-JP", "ISO-2022-JP-2", "ISO-2022-KR",
+				"ISO-8859-1", "ISO-8859-13", "ISO-8859-15", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4",
+				"ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9", "JIS_X0201",
+				"JIS_X0212-1990", "KOI8-R", "KOI8-U", "Shift_JIS", "TIS-620", "US-ASCII", "UTF-16",
+				"UTF-16BE", "UTF-16LE", "UTF-32", "UTF-32BE", "UTF-32LE", "UTF-8", "windows-1250",
+				"windows-1251", "windows-1252", "windows-1253", "windows-1254", "windows-1255",
+				"windows-1256", "windows-1257", "windows-1258", "windows-31j", "x-Big5-HKSCS-2001",
+				"x-Big5-Solaris", "x-euc-jp-linux", "x-EUC-TW", "x-eucJP-Open", "x-IBM1006", "x-IBM1025",
+				"x-IBM1046", "x-IBM1097", "x-IBM1098", "x-IBM1112", "x-IBM1122", "x-IBM1123", "x-IBM1124",
+				"x-IBM1364", "x-IBM1381", "x-IBM1383", "x-IBM300", "x-IBM33722", "x-IBM737", "x-IBM833",
+				"x-IBM834", "x-IBM856", "x-IBM874", "x-IBM875", "x-IBM921", "x-IBM922", "x-IBM930",
+				"x-IBM933", "x-IBM935", "x-IBM937", "x-IBM939", "x-IBM942", "x-IBM942C", "x-IBM943",
+				"x-IBM943C", "x-IBM948", "x-IBM949", "x-IBM949C", "x-IBM950", "x-IBM964", "x-IBM970",
+				"x-ISCII91", "x-ISO-2022-CN-CNS", "x-ISO-2022-CN-GB", "x-iso-8859-11", "x-JIS0208",
+				"x-JISAutoDetect", "x-Johab", "x-MacArabic", "x-MacCentralEurope", "x-MacCroatian",
+				"x-MacCyrillic", "x-MacDingbat", "x-MacGreek", "x-MacHebrew", "x-MacIceland", "x-MacRoman",
+				"x-MacRomania", "x-MacSymbol", "x-MacThai", "x-MacTurkish", "x-MacUkraine", "x-MS932_0213",
+				"x-MS950-HKSCS", "x-MS950-HKSCS-XP", "x-mswin-936", "x-PCK", "x-SJIS_0213", "x-UTF-16LE-BOM",
+				"X-UTF-32BE-BOM", "X-UTF-32LE-BOM", "x-windows-50220", "x-windows-50221", "x-windows-874",
+				"x-windows-949", "x-windows-950", "x-windows-iso2022jp"};
+		encoding = new JComboBox<String>(boxString);
+		encoding.setSelectedItem(MainFrame.properties.getProperty("encoding", "GBK"));
+        
 		separatorText = new JTextField(2);
-		separatorText.setText(MainFrame.properties.getProperty("separator"));
+		separatorText.setText(MainFrame.properties.getProperty("separator", ","));
 		
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 			tableHead = new JCheckBox("Header");
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			tableHead = new JCheckBox("表头");
 		}
-		if(MainFrame.properties.getProperty("header").equals("true"))
+		if(MainFrame.properties.getProperty("header", "true").equals("true"))
 		{
 			tableHead.setSelected(true);
 		}
-		else if(MainFrame.properties.getProperty("header").equals("false"))
+		else if(MainFrame.properties.getProperty("header", "true").equals("false"))
 		{
 			tableHead.setSelected(false);
 		}
         
 		buttonPanel = new JPanel();
 		buttonPanel.add(fileButton);
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+		{
+			buttonPanel.add(new JLabel("Encoding: "));
+		}
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+		{
+			buttonPanel.add(new JLabel("文件编码："));
+		}
+		buttonPanel.add(encoding);
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 			buttonPanel.add(new JLabel("Csv seperator: "));
 		}
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			buttonPanel.add(new JLabel("Csv分隔符："));
 		}
@@ -969,21 +1008,21 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long diffMinutes = diff / (60 * 1000) % 60;
             long diffHours = diff / (60 * 60 * 1000) % 24;
             long diffDays = diff / (24 * 60 * 60 * 1000);
-    		if(MainFrame.properties.getProperty("language").equals("enUS"))
+    		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tableData[i][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tableData[i][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
     	 	}
         }
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        String[] headlines = {"Case ID","Events","Started","Finished","Duration"};
 	        overviewCaseTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"实例名","事件数","开始时间","结束时间","持续时间"};
 	        overviewCaseTableModel = new DefaultTableModel(tableData, headlines);
@@ -1010,11 +1049,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         for(int i = 0; i < size; i++)
         {
             Variant variant = MainFrame.variantCollection.getVariant(i);
-    		if(MainFrame.properties.getProperty("language").equals("enUS"))
+    		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tableData[i][0] = "Variant " + variant.getVariant();
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tableData[i][0] = "实例种类" + variant.getVariant();
     	 	}
@@ -1024,11 +1063,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long medianMinutes = median / (60 * 1000) % 60;
             long medianHours = median / (60 * 60 * 1000) % 24;
             long medianDays = median / (24 * 60 * 60 * 1000);
-    		if(MainFrame.properties.getProperty("language").equals("enUS"))
+    		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tableData[i][3] = medianDays + " days " + medianHours + " hours " + medianMinutes + " mins";
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tableData[i][3] = medianDays + "天" + medianHours + "小时" + medianMinutes + "分";
     	 	}
@@ -1036,21 +1075,21 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long meanMinutes = mean / (60 * 1000) % 60;
             long meanHours = mean / (60 * 60 * 1000) % 24;
             long meanDays = mean / (24 * 60 * 60 * 1000);
-    		if(MainFrame.properties.getProperty("language").equals("enUS"))
+    		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tableData[i][4] = meanDays + " days " + meanHours + " hours " + meanMinutes + " mins";
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tableData[i][4] = meanDays + "天" + meanHours + "小时" + meanMinutes + "分";
     	 	}
         }
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        String[] headlines = {"Variant","Cases","Events","Median duration","Mean duration"};
 	        overviewVariantTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"实例种类","实例数","事件数","中位时间","平均时间"};
 	        overviewVariantTableModel = new DefaultTableModel(tableData, headlines);
@@ -1070,7 +1109,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
     
     public void updateOverviewLabel()
     {
-		if(MainFrame.properties.getProperty("language").equals("enUS"))
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 	        overviewEventsLabel.setText("Events : " + MainFrame.eventCollection.getSize());
 	        overviewCasesLabel.setText("Cases : " + MainFrame.caseCollection.getSize());
@@ -1089,7 +1128,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 	        overviewStartLabel.setText("Start : " + formatter.format(MainFrame.caseCollection.getStart()));
 	        overviewEndLabel.setText("End : " + formatter.format(MainFrame.caseCollection.getEnd()));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        overviewEventsLabel.setText("事件数：" + MainFrame.eventCollection.getSize());
 	        overviewCasesLabel.setText("实例数：" + MainFrame.caseCollection.getSize());
@@ -1145,11 +1184,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewEventsOverTimeChart.setBackgroundPaint(null);
         XYPlot plot = overviewEventsOverTimeChart.getXYPlot();
         DateAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new DateAxis("Log timeline");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new DateAxis("时间轴");
 	 	}
@@ -1162,11 +1201,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Events");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("事件数");
 	 	}
@@ -1182,11 +1221,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         XYAreaRenderer renderer = (XYAreaRenderer) plot.getRenderer();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("{1}, {2} events", dateFormatter, numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("{1}，{2}个事件", dateFormatter, numberFormatter));
 	 	}
@@ -1229,11 +1268,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewActiveCasesOverTimeChart.setBackgroundPaint(null);
         XYPlot plot = overviewActiveCasesOverTimeChart.getXYPlot();
         DateAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new DateAxis("Log timeline");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new DateAxis("时间轴");
 	 	}
@@ -1246,11 +1285,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Active Cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1266,11 +1305,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         XYAreaRenderer renderer = (XYAreaRenderer) plot.getRenderer();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("{1}, {2} active cases", dateFormatter, numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("{1}，{2}个实例", dateFormatter, numberFormatter));
 	 	}
@@ -1306,11 +1345,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewCaseVariantsChart.setBackgroundPaint(null);
         XYPlot plot = overviewCaseVariantsChart.getXYPlot();
         NumberAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new NumberAxis("Variants");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new NumberAxis("实例种类");
 	 	}
@@ -1323,11 +1362,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Number of cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1342,11 +1381,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("Variant {1}, {2} cases", numberFormatter, numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("实例种类{1}，{2}个实例", numberFormatter, numberFormatter));
 	 	}
@@ -1381,11 +1420,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewEventsPerCaseChart.setBackgroundPaint(null);
         XYPlot plot = overviewEventsPerCaseChart.getXYPlot();
         NumberAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new NumberAxis("Events per case");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new NumberAxis("事件数");
 	 	}
@@ -1398,11 +1437,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Number of cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1417,11 +1456,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("{1} events, {2} cases", numberFormatter, numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("{1}个事件，{2}个实例", numberFormatter, numberFormatter));
 	 	}
@@ -1442,11 +1481,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long durationMinutes = duration / (60 * 1000) % 60;
             long durationHours = duration / (60 * 60 * 1000) % 24;
             long durationDays = duration / (24 * 60 * 60 * 1000);
-            if(MainFrame.properties.getProperty("language").equals("enUS"))
+            if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tips.add("Up to " + durationDays + " days " + durationHours + " hours " + durationMinutes + " mins, " + count + " cases");
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tips.add("不大于" + durationDays + "天" + durationHours + "小时" + durationMinutes + "分，" + count + "个实例");
     	 	}
@@ -1471,11 +1510,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewCaseDurationChart.setBackgroundPaint(null);
         XYPlot plot = overviewCaseDurationChart.getXYPlot();
         NumberAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new NumberAxis("Case duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new NumberAxis("实例持续时间");
 	 	}
@@ -1488,11 +1527,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Number of cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1540,11 +1579,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewCaseUtilizationChart.setBackgroundPaint(null);
         XYPlot plot = overviewCaseUtilizationChart.getXYPlot();
         NumberAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new NumberAxis("Relative active time");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new NumberAxis("活动时间百分比");
 	 	}
@@ -1557,11 +1596,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Number of cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1576,11 +1615,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("Up to {1}%, {2} cases", numberFormatter, numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator("不大于{1}%, {2}个实例", numberFormatter, numberFormatter));
 	 	}
@@ -1601,11 +1640,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long durationMinutes = (long) duration / (60 * 1000) % 60;
             long durationHours = (long) duration / (60 * 60 * 1000) % 24;
             long durationDays = (long) duration / (24 * 60 * 60 * 1000);
-            if(MainFrame.properties.getProperty("language").equals("enUS"))
+            if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tips.add("Up to " + durationDays + " days " + durationHours + " hours " + durationMinutes + " mins, " + count + " cases");
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tips.add("不大于" + durationDays + "天" + durationHours + "小时" + durationMinutes + "分，" + count + "个实例");
     	 	}
@@ -1630,11 +1669,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewMeanActivityDurationChart.setBackgroundPaint(null);
         XYPlot plot = overviewMeanActivityDurationChart.getXYPlot();
         NumberAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new NumberAxis("Mean activity duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new NumberAxis("平均活动时间");
 	 	}
@@ -1647,11 +1686,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Number of cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1685,11 +1724,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             long durationMinutes = (long) duration / (60 * 1000) % 60;
             long durationHours = (long) duration / (60 * 60 * 1000) % 24;
             long durationDays = (long) duration / (24 * 60 * 60 * 1000);
-            if(MainFrame.properties.getProperty("language").equals("enUS"))
+            if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tips.add("Up to " + durationDays + " days " + durationHours + " hours " + durationMinutes + " mins, " + count + " cases");
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 tips.add("不大于" + durationDays + "天" + durationHours + "小时" + durationMinutes + "分，" + count + "个实例");
     	 	}
@@ -1714,11 +1753,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         overviewMeanWaitingTimeChart.setBackgroundPaint(null);
         XYPlot plot = overviewMeanWaitingTimeChart.getXYPlot();
         NumberAxis domain = new NumberAxis("Mean waiting time");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new NumberAxis("Mean waiting time");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new NumberAxis("平均等待时间");
 	 	}
@@ -1731,11 +1770,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Number of cases");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("实例数");
 	 	}
@@ -1769,7 +1808,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             tableData[i][0] = activity.getActivity();
             tableData[i][1] = activity.getFrequency() + "";
             tableData[i][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
-            if(MainFrame.properties.getProperty("language").equals("enUS"))
+            if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 long median = activity.getMedianDuration();
                 long medianMinutes = median / (60 * 1000) % 60;
@@ -1787,7 +1826,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                 long maxDays = max / (24 * 60 * 60 * 1000);
                 tableData[i][5] = maxDays + " days " + maxHours + " hours " + maxMinutes + " mins";
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 long median = activity.getMedianDuration();
                 long medianMinutes = median / (60 * 1000) % 60;
@@ -1807,12 +1846,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         }
         
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             String[] headlines = {"Activity","Frequency","Relative frequency","Median duration","Mean duration","Duration range"};
             activityAllActivitiesTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"活动","频度","相对频度","中位时间","平均时间","最大时间"};
 	        activityAllActivitiesTableModel = new DefaultTableModel(tableData, headlines);
@@ -1845,7 +1884,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                 tableData[j][0] = activity.getActivity();
                 tableData[j][1] = activity.getFrequency() + "";
                 tableData[j][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
-                if(MainFrame.properties.getProperty("language").equals("enUS"))
+                if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = activity.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -1863,7 +1902,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                     long maxDays = max / (24 * 60 * 60 * 1000);
                     tableData[j][5] = maxDays + " days " + maxHours + " hours " + maxMinutes + " mins";
                 }
-        		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+        		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
         		{
                     long median = activity.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -1885,12 +1924,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         }
         
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             String[] headlines = {"Activity","Frequency","Relative frequency","Median duration","Mean duration","Duration range"};
             activityFirstInCaseTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"活动","频度","相对频度","中位时间","平均时间","最大时间"};
 	        activityFirstInCaseTableModel = new DefaultTableModel(tableData, headlines);
@@ -1923,7 +1962,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                 tableData[j][0] = activity.getActivity();
                 tableData[j][1] = activity.getFrequency() + "";
                 tableData[j][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
-                if(MainFrame.properties.getProperty("language").equals("enUS"))
+                if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = activity.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -1941,7 +1980,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                     long maxDays = max / (24 * 60 * 60 * 1000);
                     tableData[j][5] = maxDays + " days " + maxHours + " hours " + maxMinutes + " mins";
                 }
-        		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+        		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
         		{
                     long median = activity.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -1963,12 +2002,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         }
         
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             String[] headlines = {"Activity","Frequency","Relative frequency","Median duration","Mean duration","Duration range"};
             activityLastInCaseTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"活动","频度","相对频度","中位时间","平均时间","最大时间"};
 	        activityLastInCaseTableModel = new DefaultTableModel(tableData, headlines);
@@ -1988,7 +2027,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
     
     public void updateActivityLabel()
     {
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             activityActivitiesLabel.setText("Activities : " + MainFrame.activityCollection.getSize());
             activityMinimalFrequencyLabel.setText("Minimal frequency : " + MainFrame.activityCollection.getMinimalFrequency());
@@ -1997,7 +2036,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             activityMaximalFrequencyLabel.setText("Maximal frequency : " + MainFrame.activityCollection.getMaximalFrequency());
             activityFrequencyStdDeviationLabel.setText("Frequency std. deviation : " + new DecimalFormat("#0.##").format(MainFrame.activityCollection.getFrequencyStdDeviation()));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        activityActivitiesLabel.setText("活动数：" + MainFrame.activityCollection.getSize());
 	        activityMinimalFrequencyLabel.setText("最小频度：" + MainFrame.activityCollection.getMinimalFrequency());
@@ -2033,11 +2072,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         activityFrequencyChart.setBackgroundPaint(null);
         CategoryPlot plot = activityFrequencyChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Activities");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("活动");
 	 	}
@@ -2050,11 +2089,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Frequency");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("频度");
 	 	}
@@ -2069,11 +2108,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{1}, {2} times", numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{1}，{2}次", numberFormatter));
 	 	}
@@ -2108,11 +2147,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         activityMedianDurationChart.setBackgroundPaint(null);
         CategoryPlot plot = activityMedianDurationChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Activities");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("活动");
 	 	}
@@ -2125,11 +2164,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Median duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("中位时间");
 	 	}
@@ -2175,11 +2214,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         activityMeanDurationChart.setBackgroundPaint(null);
         CategoryPlot plot = activityMeanDurationChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Activities");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("活动");
 	 	}
@@ -2192,11 +2231,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Mean duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("平均时间");
 	 	}
@@ -2242,11 +2281,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         activityDurationRangeChart.setBackgroundPaint(null);
         CategoryPlot plot = activityDurationRangeChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Activities");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("活动");
 	 	}
@@ -2259,11 +2298,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Duration range");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("最大时间");
 	 	}
@@ -2309,11 +2348,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         activityAggregateDurationChart.setBackgroundPaint(null);
         CategoryPlot plot = activityAggregateDurationChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Activities");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("活动");
 	 	}
@@ -2326,11 +2365,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Aggregate duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("累积时间");
 	 	}
@@ -2362,7 +2401,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             tableData[i][0] = resource.getResource();
             tableData[i][1] = resource.getFrequency() + "";
             tableData[i][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
-            if(MainFrame.properties.getProperty("language").equals("enUS"))
+            if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 long median = resource.getMedianDuration();
                 long medianMinutes = median / (60 * 1000) % 60;
@@ -2380,7 +2419,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                 long maxDays = max / (24 * 60 * 60 * 1000);
                 tableData[i][5] = maxDays + " days " + maxHours + " hours " + maxMinutes + " mins";
             }
-    		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
                 long median = resource.getMedianDuration();
                 long medianMinutes = median / (60 * 1000) % 60;
@@ -2400,12 +2439,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         }
         
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             String[] headlines = {"Resource","Frequency","Relative frequency","Median duration","Mean duration","Duration range"};
             resourceAllResourcesTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"资源","频度","相对频度","中位时间","平均时间","最大时间"};
 	        resourceAllResourcesTableModel = new DefaultTableModel(tableData, headlines);
@@ -2438,7 +2477,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                 tableData[j][0] = resource.getResource();
                 tableData[j][1] = resource.getFrequency() + "";
                 tableData[j][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
-                if(MainFrame.properties.getProperty("language").equals("enUS"))
+                if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = resource.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -2456,7 +2495,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                     long maxDays = max / (24 * 60 * 60 * 1000);
                     tableData[j][5] = maxDays + " days " + maxHours + " hours " + maxMinutes + " mins";
                 }
-        		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+        		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
         		{
                     long median = resource.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -2478,12 +2517,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         }
         
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             String[] headlines = {"Resource","Frequency","Relative frequency","Median duration","Mean duration","Duration range"};
             resourceFirstInCaseTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"资源","频度","相对频度","中位时间","平均时间","最大时间"};
 	        resourceFirstInCaseTableModel = new DefaultTableModel(tableData, headlines);
@@ -2516,7 +2555,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                 tableData[j][0] = resource.getResource();
                 tableData[j][1] = resource.getFrequency() + "";
                 tableData[j][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
-                if(MainFrame.properties.getProperty("language").equals("enUS"))
+                if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = resource.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -2534,7 +2573,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
                     long maxDays = max / (24 * 60 * 60 * 1000);
                     tableData[j][5] = maxDays + " days " + maxHours + " hours " + maxMinutes + " mins";
                 }
-        		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+        		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
         		{
                     long median = resource.getMedianDuration();
                     long medianMinutes = median / (60 * 1000) % 60;
@@ -2556,12 +2595,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             }
         }
         
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             String[] headlines = {"Resource","Frequency","Relative frequency","Median duration","Mean duration","Duration range"};
             resourceLastInCaseTableModel = new DefaultTableModel(tableData, headlines);
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        String[] headlines = {"资源","频度","相对频度","中位时间","平均时间","最大时间"};
 	        resourceLastInCaseTableModel = new DefaultTableModel(tableData, headlines);
@@ -2581,7 +2620,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
     
     public void updateResourceLabel()
     {
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             resourceResourcesLabel.setText("Resources : " + MainFrame.resourceCollection.getSize());
             resourceMinimalFrequencyLabel.setText("Minimal frequency : " + MainFrame.resourceCollection.getMinimalFrequency());
@@ -2590,7 +2629,7 @@ public class StaticsPanel extends JPanel implements ComponentListener {
             resourceMaximalFrequencyLabel.setText("Maximal frequency : " + MainFrame.resourceCollection.getMaximalFrequency());
             resourceFrequencyStdDeviationLabel.setText("Frequency std. deviation : " + new DecimalFormat("#0.##").format(MainFrame.resourceCollection.getFrequencyStdDeviation()));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        resourceResourcesLabel.setText("资源数：" + MainFrame.resourceCollection.getSize());
 	        resourceMinimalFrequencyLabel.setText("最小频度：" + MainFrame.resourceCollection.getMinimalFrequency());
@@ -2626,11 +2665,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceFrequencyChart.setBackgroundPaint(null);
         CategoryPlot plot = resourceFrequencyChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Resources");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("资源");
 	 	}
@@ -2643,11 +2682,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Frequency");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("频度");
 	 	}
@@ -2662,11 +2701,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
         DecimalFormat numberFormatter = new DecimalFormat("#0");
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
             renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{1}, {2} times", numberFormatter));
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 	        renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("{1}，{2}次", numberFormatter));
 	 	}        
@@ -2701,11 +2740,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceMedianDurationChart.setBackgroundPaint(null);
         CategoryPlot plot = resourceMedianDurationChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Resources");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("资源");
 	 	}
@@ -2718,11 +2757,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Median duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("中位时间");
 	 	}
@@ -2768,11 +2807,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceMeanDurationChart.setBackgroundPaint(null);
         CategoryPlot plot = resourceMeanDurationChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Resources");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("资源");
 	 	}
@@ -2785,11 +2824,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Mean duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("平均时间");
 	 	}
@@ -2835,11 +2874,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceDurationRangeChart.setBackgroundPaint(null);
         CategoryPlot plot = resourceDurationRangeChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Resources");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("资源");
 	 	}
@@ -2852,11 +2891,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Duration range");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("最大时间");
 	 	}
@@ -2902,11 +2941,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceAggregateDurationChart.setBackgroundPaint(null);
         CategoryPlot plot = resourceAggregateDurationChart.getCategoryPlot();
         CategoryAxis domain;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	domain = new CategoryAxis("Resources");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			domain = new CategoryAxis("资源");
 	 	}
@@ -2919,11 +2958,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         domain.setTickMarksVisible(false);
         plot.setDomainAxis(domain);
         NumberAxis range;
-        if(MainFrame.properties.getProperty("language").equals("enUS"))
+        if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
         	range = new NumberAxis("Aggregate duration");
         }
-		else if(MainFrame.properties.getProperty("language").equals("zhCN"))
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
 			range = new NumberAxis("累积时间");
 	 	}
