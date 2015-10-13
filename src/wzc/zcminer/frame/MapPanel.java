@@ -2,63 +2,37 @@ package wzc.zcminer.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileFilter;
 
-import wzc.zcminer.global.ActiveCasesOverTimeChart;
-import wzc.zcminer.global.ActivityCollection;
-import wzc.zcminer.global.CaseCollection;
-import wzc.zcminer.global.CaseDurationChart;
-import wzc.zcminer.global.CaseUtilizationChart;
-import wzc.zcminer.global.EventCollection;
 import wzc.zcminer.global.Event;
-import wzc.zcminer.global.EventsOverTimeChart;
-import wzc.zcminer.global.EventsPerCaseChart;
-import wzc.zcminer.global.GraphNet;
-import wzc.zcminer.global.MeanActivityDurationChart;
-import wzc.zcminer.global.MeanWaitingTimeChart;
-import wzc.zcminer.global.ResourceCollection;
-import wzc.zcminer.global.VariantCollection;
-import jdk.internal.org.objectweb.asm.tree.analysis.Value;
 
 import com.mxgraph.layout.mxParallelEdgeLayout;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.orthogonal.mxOrthogonalLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
-import com.sun.media.jfxmedia.events.NewFrameEvent;
+
 //map面板
 public class MapPanel extends JPanel implements ComponentListener {
 	//参数滑块

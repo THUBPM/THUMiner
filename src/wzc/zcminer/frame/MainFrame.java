@@ -1,12 +1,7 @@
 package wzc.zcminer.frame;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,7 +10,6 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;

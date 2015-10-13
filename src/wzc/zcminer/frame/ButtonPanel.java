@@ -1,35 +1,9 @@
 package wzc.zcminer.frame;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-
-import wzc.zcminer.global.ActiveCasesOverTimeChart;
-import wzc.zcminer.global.ActivityCollection;
-import wzc.zcminer.global.CaseCollection;
-import wzc.zcminer.global.CaseDurationChart;
-import wzc.zcminer.global.CaseUtilizationChart;
-import wzc.zcminer.global.EventCollection;
-import wzc.zcminer.global.EventsOverTimeChart;
-import wzc.zcminer.global.EventsPerCaseChart;
-import wzc.zcminer.global.GraphNet;
-import wzc.zcminer.global.MeanActivityDurationChart;
-import wzc.zcminer.global.MeanWaitingTimeChart;
-import wzc.zcminer.global.ResourceCollection;
-import wzc.zcminer.global.VariantCollection;
 
 //切换界面
 public class ButtonPanel extends JPanel{

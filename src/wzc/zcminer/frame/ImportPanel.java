@@ -1,7 +1,6 @@
 package wzc.zcminer.frame;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,49 +9,37 @@ import java.awt.event.MouseEvent;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileFilter;
 
-import sun.applet.Main;
-import wzc.zcminer.global.ActiveCasesOverTimeChart;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import wzc.zcminer.global.Activity;
-import wzc.zcminer.global.ActivityCollection;
-import wzc.zcminer.global.CaseDurationChart;
-import wzc.zcminer.global.CaseUtilizationChart;
 import wzc.zcminer.global.ColumnSelectableJTable;
-import wzc.zcminer.global.EventCollection;
 import wzc.zcminer.global.Event;
-import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.Case;
-import wzc.zcminer.global.EventsOverTimeChart;
-import wzc.zcminer.global.EventsPerCaseChart;
-import wzc.zcminer.global.GraphNet;
-import wzc.zcminer.global.MeanActivityDurationChart;
-import wzc.zcminer.global.MeanWaitingTimeChart;
 import wzc.zcminer.global.Resource;
-import wzc.zcminer.global.ResourceCollection;
-import wzc.zcminer.global.VariantCollection;
 import wzc.zcminer.global.Variant;
 
-import com.mxgraph.util.mxRectangle;
 import com.opencsv.CSVReader;
+
 //数据导入面板
 public class ImportPanel extends JPanel {
 	static ColumnSelectableJTable table;
@@ -200,10 +187,41 @@ public class ImportPanel extends JPanel {
 			buttonGroup.add(resourseButton);
 			buttonGroup.add(otherButton);
 			add(radioPanel, BorderLayout.PAGE_START);
-			//csv数据导入
-			DataInputStream input = new DataInputStream(new FileInputStream(new File(dataName)));
-			CSVReader reader = new CSVReader(new InputStreamReader(input, encodingText), separator);
-			myEntries = reader.readAll();
+			
+			if(dataName.endsWith(".xls") || dataName.endsWith(".xlsx"))
+			{
+			    String fileType = dataName.substring(dataName.lastIndexOf(".") + 1, dataName.length());
+			    InputStream stream = new FileInputStream(dataName);
+			    Workbook wb = null;
+			    if(fileType.equals("xls")) {
+			    	wb = new HSSFWorkbook(stream);
+			    }
+			    else if(fileType.equals("xlsx"))
+			    {
+			    	wb = new XSSFWorkbook(stream);
+			    }
+			    Sheet sheet1 = wb.getSheetAt(0);
+			    myEntries = new ArrayList<String[]>();
+			    for(Row row : sheet1)
+			    {
+			    	String[] rowData = new String[row.getPhysicalNumberOfCells()];
+			    	for(Cell cell : row)
+			    	{
+			    		cell.setCellType(Cell.CELL_TYPE_STRING);
+			    		rowData[cell.getColumnIndex()] = cell.getStringCellValue();
+			    	}
+			    	myEntries.add(rowData);
+			    }
+			}
+			else
+			{
+				//csv数据导入
+				DataInputStream input = new DataInputStream(new FileInputStream(new File(dataName)));
+				CSVReader reader = new CSVReader(new InputStreamReader(input, encodingText), separator);
+				myEntries = reader.readAll();
+				reader.close();
+			}
+			
 			String[] headlines;
 			if(hasTableHead)
 			{
@@ -272,7 +290,6 @@ public class ImportPanel extends JPanel {
 
 			JScrollPane dataPanel = new JScrollPane(table);
 			add(dataPanel, BorderLayout.CENTER);
-			reader.close();
 			//逻辑分析代码，得出所有信息
 			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 			{
