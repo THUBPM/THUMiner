@@ -293,7 +293,7 @@ public class MapPanel extends JPanel implements ComponentListener {
         timer.scheduleAtFixedRate(new TimerTask() {  
             public void run() {  
             	currentTime=currentTime + speed;
-            	if (currentTime > MainFrame.graphNet.endTime){
+            	if (currentTime >= MainFrame.graphNet.endTime){
 					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 					{
 						animationButton.setText("Animation");
@@ -309,6 +309,7 @@ public class MapPanel extends JPanel implements ComponentListener {
 					timeFlag = 0;
 					paintGraph();
 					timer.cancel();
+					return;
             	}
             	int[] activityEvent = new int[MainFrame.graphNet.activityCount];
             	int[][] activityEventEdge = new int[MainFrame.graphNet.activityCount][MainFrame.graphNet.activityCount];
@@ -369,15 +370,15 @@ public class MapPanel extends JPanel implements ComponentListener {
             	}
 	            	
             	for (int i = 0; i< MainFrame.graphNet.activityCount;i++)
-            	if (MainFrame.graphNet.activityFre[i] >= temp[activitySlider
-     			               								.getValue()]){
+            	if (i < 2 || (MainFrame.graphNet.activityFre[i] >= temp[activitySlider
+     			               								.getValue()])){
             		for (int j = 0; j< MainFrame.graphNet.activityCount; j++){
-            			if ( MainFrame.graphNet.activityFre[j] >= temp[activitySlider
+            			if (j < 2 || (MainFrame.graphNet.activityFre[j] >= temp[activitySlider
             			               								.getValue()]
             			               								&& MainFrame.graphNet.activityQueFre[i][j] >= MainFrame.graphNet.activityQueFreSort.
-            			               								get(pathSlider.getValue()) && MainFrame.graphNet.activityQueFre[i][j] > 0){ 
+            			               								get(pathSlider.getValue()) && MainFrame.graphNet.activityQueFre[i][j] >= 0)){ 
             				for (Object edge : graph.getEdgesBetween(v[i], v[j])){
-            					graph.cellLabelChanged(edge, activityEventEdge[i][j], false);
+           						graph.cellLabelChanged(edge, activityEventEdge[i][j], false);
             				}
             				
             				if(   activityEventEdge[i][j] > 0 ){
