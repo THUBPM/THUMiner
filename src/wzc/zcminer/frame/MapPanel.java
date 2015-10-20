@@ -10,6 +10,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Timer;
@@ -38,17 +41,21 @@ public class MapPanel extends JPanel implements ComponentListener {
 	//参数滑块
 	static JSlider pathSlider;   
 	static JSlider activitySlider;
-	//动画速度滑块
+	//动画滑块
+	static JSlider speedSlider;
 	static JSlider animationSlider;
 	//类型选择
 	static JComboBox<String> modelType;
-	static JPanel sliderJPanel;
-	static JPanel labelPanel;
-	static JPanel headPanel;
-	static JPanel centerPanel;
+	static JPanel countSliderPanel;
+	static JPanel countLabelPanel;
+	static JPanel countPanel;
 	static JPanel animationPanel;
+	static JPanel speedSliderPanel;
+	static JPanel animationSliderPanel;
+	static JPanel animationButtonPanel;
 	static JPanel controlPanel;
 	static JButton animationButton;
+	static JButton pauseButton;
 	//切换页面
 	static ButtonPanel buttonPanel;
 	
@@ -57,11 +64,13 @@ public class MapPanel extends JPanel implements ComponentListener {
 	mxGraph graph;
 	Object parent;
 	Timer timer;
-	int timeFlag;
+	TimerTask timerTask;
+	int animationFlag;
+	int pauseFlag;
 	long speed;
 	long currentTime;
 	//图像节点
-	Object[]  v;
+	Object[] v;
 	
 	public MapPanel() {
 		// TODO Auto-generated constructor stub
@@ -71,29 +80,27 @@ public class MapPanel extends JPanel implements ComponentListener {
 		controlPanel = new JPanel();
 		controlPanel.setLayout(new BorderLayout());
 		
-		headPanel = new JPanel();
-		headPanel.setLayout(new BorderLayout());
+		countPanel = new JPanel();
+		countPanel.setLayout(new BorderLayout());
 		
-		centerPanel = new JPanel(new BorderLayout());
+		animationPanel = new JPanel(new BorderLayout());
 		
-		sliderJPanel = new JPanel();
-		sliderJPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		countSliderPanel = new JPanel();
+		countSliderPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		labelPanel = new JPanel();
-		labelPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		countLabelPanel = new JPanel();
+		countLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-			labelPanel.add(new JLabel("Path"));
-			labelPanel.add(new JLabel("Activity"));
+			countLabelPanel.add(new JLabel("Path"));
+			countLabelPanel.add(new JLabel("Activity"));
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-			labelPanel.add(new JLabel("路径数"));
-			labelPanel.add(new JLabel("活动数"));
+			countLabelPanel.add(new JLabel("路径数"));
+			countLabelPanel.add(new JLabel("活动数"));
 	    }
-		
-		animationPanel = new JPanel(new FlowLayout());
 		
 		//选择模块初始
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
@@ -131,7 +138,7 @@ public class MapPanel extends JPanel implements ComponentListener {
 				}
 			}
 		});
-		sliderJPanel.add(pathSlider);
+		countSliderPanel.add(pathSlider);
 		//活动参数滑块
 		activitySlider = new JSlider(JSlider.VERTICAL);
 		activitySlider.setMinimum(0);
@@ -146,28 +153,30 @@ public class MapPanel extends JPanel implements ComponentListener {
 				}
 			}
 		});
-		sliderJPanel.add(activitySlider);
+		countSliderPanel.add(activitySlider);
 
-		headPanel.add(labelPanel, BorderLayout.NORTH);
-		headPanel.add(sliderJPanel, BorderLayout.CENTER);
-	//	centerPanel.add(sliderJPanel,BorderLayout.CENTER);
+		countPanel.add(countLabelPanel, BorderLayout.NORTH);
+		countPanel.add(countSliderPanel, BorderLayout.CENTER);
+		
 		//动画设置
 		speed = 1;
-		animationSlider = new JSlider();
-		animationSlider.setMinimum(1);
+		speedSlider = new JSlider();
+		speedSlider.setMinimum(1);
 		long period =MainFrame.graphNet.endTime- MainFrame.graphNet.beginTime;
-		animationSlider.setMaximum((int) (period / 50));
-		animationSlider.setValue(1);
-		animationSlider.setExtent(1);
-		animationSlider.addChangeListener(new ChangeListener() {
+		speedSlider.setMaximum((int) (period / 50));
+		speedSlider.setValue(1);
+		speedSlider.setExtent(1);
+		speedSlider.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				if (animationSlider.getValueIsAdjusting() != true) {
-					speed = animationSlider.getValue();
+				if (speedSlider.getValueIsAdjusting() != true) {
+					speed = speedSlider.getValue();
 				}
 			}
 		});
-		timeFlag = 0;
+		
+		animationFlag = 0;
+		pauseFlag = 0;
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 			animationButton = new JButton("Animation");
@@ -176,11 +185,90 @@ public class MapPanel extends JPanel implements ComponentListener {
 		{
 			animationButton = new JButton("播放动画");
 	    }
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+		{
+			pauseButton = new JButton("Pause");
+		}
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+		{
+			pauseButton = new JButton("暂停播放");
+	    }
+		
+		animationSlider = new JSlider();
+		animationSlider.setMinimum(0);
+		animationSlider.setMaximum(100);
+		animationSlider.setValue(0);
+		animationSlider.setExtent(1);
+		animationSlider.setPreferredSize(new Dimension(MainFrame.mainFrame.getWidth() - 100, 40));
+		animationSlider.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				if(animationFlag == 1)
+				{
+					if(pauseFlag == 0)
+						timer.cancel();
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(animationFlag == 1)
+				{
+					currentTime = MainFrame.graphNet.beginTime + (int) ((MainFrame.graphNet.endTime - MainFrame.graphNet.beginTime) / 100 * animationSlider.getValue());
+					if(pauseFlag == 0)
+						startAnimation();
+					else
+						paintAnimation();
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		animationSlider.addMouseMotionListener(new MouseMotionListener() {
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				currentTime = MainFrame.graphNet.beginTime + (int) ((MainFrame.graphNet.endTime - MainFrame.graphNet.beginTime) / 100 * animationSlider.getValue());
+				paintAnimation();
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		pauseButton.setEnabled(false);
+		speedSlider.setEnabled(false);
 		animationSlider.setEnabled(false);
+		
 		animationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (timeFlag == 0){
-					timeFlag = 1;
+				if (animationFlag == 0){
+					animationFlag = 1;
+					pauseFlag = 0;
+					currentTime = MainFrame.graphNet.beginTime;
 					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 					{
 						animationButton.setText("Stop");
@@ -190,10 +278,21 @@ public class MapPanel extends JPanel implements ComponentListener {
 						animationButton.setText("结束播放");
 				    }
 					modelType.setEnabled(false);
+					speedSlider.setEnabled(true);
 					animationSlider.setEnabled(true);
+					animationSlider.setValue(0);
 					pathSlider.setEnabled(false);
 					activitySlider.setEnabled(false);
-					paintAnimation();
+					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+					{
+						pauseButton.setText("Pause");
+					}
+					else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+					{
+						pauseButton.setText("暂停播放");
+				    }
+					pauseButton.setEnabled(true);
+					startAnimation();
 				} else{
 					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 					{
@@ -204,61 +303,103 @@ public class MapPanel extends JPanel implements ComponentListener {
 						animationButton.setText("播放动画");
 				    }
 					modelType.setEnabled(true);
+					speedSlider.setEnabled(false);
 					animationSlider.setEnabled(false);
+					animationSlider.setValue(0);
 					pathSlider.setEnabled(true);
 					activitySlider.setEnabled(true);
-					timeFlag = 0;
+					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+					{
+						pauseButton.setText("Pause");
+					}
+					else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+					{
+						pauseButton.setText("暂停播放");
+				    }
+					pauseButton.setEnabled(false);
+					animationFlag = 0;
+					pauseFlag = 0;
+					currentTime = MainFrame.graphNet.beginTime;
 					timer.cancel();
 					paintGraph();
 					
 				}
 			}
 		});
+		pauseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (pauseFlag == 0){
+					pauseFlag = 1;
+					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+					{
+						pauseButton.setText("Continue");
+					}
+					else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+					{
+						pauseButton.setText("继续播放");
+				    }
+					timer.cancel();
+				} else{
+					pauseFlag = 0;
+					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+					{
+						pauseButton.setText("Pause");
+					}
+					else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+					{
+						pauseButton.setText("暂停播放");
+					}
+					startAnimation();
+				}
+			}
+		});
 		//面板布局
+		animationButtonPanel = new JPanel(new FlowLayout());
+		speedSliderPanel = new JPanel(new FlowLayout());
+		
+		animationButtonPanel.add(animationButton);
+		animationButtonPanel.add(pauseButton);
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-			animationPanel.add(new JLabel("Speed"));
+			speedSliderPanel.add(new JLabel("Speed"));
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-			animationPanel.add(new JLabel("播放速度"));
+			speedSliderPanel.add(new JLabel("播放速度"));
 	    }
-		animationPanel.add(animationSlider);
-		centerPanel.add(animationButton,BorderLayout.NORTH);
+		speedSliderPanel.add(speedSlider);
+		animationPanel.add(animationButtonPanel,BorderLayout.NORTH);
+		animationPanel.add(speedSliderPanel, BorderLayout.CENTER);
 		
-		centerPanel.add(animationPanel, BorderLayout.CENTER);
 		
-		
-		controlPanel.add(headPanel, BorderLayout.NORTH);
-		controlPanel.add(centerPanel, BorderLayout.CENTER);
+		controlPanel.add(countPanel, BorderLayout.NORTH);
+		controlPanel.add(animationPanel, BorderLayout.CENTER);
 		controlPanel.add(modelType, BorderLayout.SOUTH);
 		
 		graph = new mxGraph();
 		parent = graph.getDefaultParent();
 		graphComponent = new mxGraphComponent(graph);
         
+		animationSliderPanel = new JPanel(new FlowLayout());
+		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+		{
+			animationSliderPanel.add(new JLabel("SeekBar"));
+		}
+		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+		{
+			animationSliderPanel.add(new JLabel("播放进度"));
+	    }
+		animationSliderPanel.add(animationSlider);
+		
 		buttonPanel = new ButtonPanel();
 		buttonPanel.setMap();
         
         add(buttonPanel, BorderLayout.NORTH);
-        /*
-         * GridBagConstraints grapgBagConstraints = new GridBagConstraints();
-         * grapgBagConstraints.gridwidth = 3; grapgBagConstraints.gridheight =
-         * 1; grapgBagConstraints.weightx = 0.7; grapgBagConstraints.weighty =
-         * 1; grapgBagConstraints.fill = GridBagConstraints.NONE;
-         */
         add(graphComponent, BorderLayout.CENTER);
-
-        /*
-         * GridBagConstraints sliderBagConstraints = new GridBagConstraints();
-         * sliderBagConstraints.gridwidth = 1; sliderBagConstraints.gridheight =
-         * 1; sliderBagConstraints.weightx = 0.3; sliderBagConstraints.weighty =
-         * 1; sliderBagConstraints.fill = GridBagConstraints.BOTH;
-         */
         add(controlPanel, BorderLayout.EAST);
+        add(animationSliderPanel, BorderLayout.SOUTH);
 
 		graphComponent.addComponentListener(this);
-		
 	    paintGraph();
 	}
 	
@@ -285,13 +426,9 @@ public class MapPanel extends JPanel implements ComponentListener {
     }
 
 	
-	//动画模拟函数
-	public void paintAnimation(){
-		timer = new Timer();  
-		currentTime = MainFrame.graphNet.beginTime;
-		
-        timer.scheduleAtFixedRate(new TimerTask() {  
-            public void run() {  
+    public void setTimerTask(){
+		timerTask = new TimerTask() {  
+            public void run() {
             	currentTime=currentTime + speed;
             	if (currentTime >= MainFrame.graphNet.endTime){
 					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
@@ -303,104 +440,126 @@ public class MapPanel extends JPanel implements ComponentListener {
 						animationButton.setText("播放动画");
 				    }
 					modelType.setEnabled(true);
+					speedSlider.setEnabled(false);
 					animationSlider.setEnabled(false);
+					animationSlider.setValue(0);
 					pathSlider.setEnabled(true);
 					activitySlider.setEnabled(true);
-					timeFlag = 0;
-					paintGraph();
+					if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+					{
+						pauseButton.setText("Pause");
+					}
+					else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+					{
+						pauseButton.setText("暂停播放");
+				    }
+					pauseButton.setEnabled(false);
+					animationFlag = 0;
+					currentTime = MainFrame.graphNet.beginTime;
 					timer.cancel();
+					paintGraph();
 					return;
             	}
-            	int[] activityEvent = new int[MainFrame.graphNet.activityCount];
-            	int[][] activityEventEdge = new int[MainFrame.graphNet.activityCount][MainFrame.graphNet.activityCount];
-            	
-            	int lastActivityId = -1;
-            	String lastCase = "";
-            	Date lastDate = new Date();
-            	int[] temp = MainFrame.graphNet.activityFre.clone();
-    			Arrays.sort(temp);
-    			
-            	for (int i = 0 ; i < MainFrame.eventCollection.getSize(); i++){
-            		
-            		Event event = MainFrame.eventCollection
-							.getEvent(i);
-            		String caseName = event.getCase();
-            		String activityName = event.getActivity();
-            		int activityId = MainFrame.graphNet
-							.getActivityId(activityName);
-        			if (MainFrame.graphNet.activityFre[activityId] < temp[activitySlider
-        			                      						.getValue()]) {
-        				continue;
-        			}
-            		if (event.getStartDate().getTime()/ (1000*60*60) <= currentTime && 
-            		        event.getEndDate().getTime()/ (1000*60*60) >= currentTime){
-            			//graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "yellow", new Object[]{v[activityId]}); 
-            			activityEvent[activityId]++;
-            		}
-            		
-            		if (caseName.equals(lastCase)){
-            			if (event.getStartDate().getTime()/ (1000*60*60) >= currentTime && 
-                				lastDate.getTime()/ (1000*60*60) <= currentTime){
-            				activityEventEdge[lastActivityId][activityId]++;
-            			}
-            		}
-            		
-            		lastCase = caseName;
-            		lastDate = event.getEndDate();
-            		lastActivityId = activityId;
-            	}
-            	
-            	for (int i = 2; i< MainFrame.graphNet.activityCount; i++)
-            		if (MainFrame.graphNet.activityFre[i] >= temp[activitySlider
-            		                      						.getValue()])
-            	{
-            		graph.cellLabelChanged(v[i], MainFrame.graphNet.activityNames[i] + "\n"+activityEvent[i], false);
-            		if (activityEvent[i] > 0){
-            			int g = activityEvent[i];
-            		//	System.out.println(g);
-            			if (g > 100){
+            	animationSlider.setValue((int) ((currentTime - MainFrame.graphNet.beginTime) * 100 / (MainFrame.graphNet.endTime - MainFrame.graphNet.beginTime)));
+            	paintAnimation();
+            }
+		};
+    }
+    
+    public void paintAnimation(){
+    	int[] activityEvent = new int[MainFrame.graphNet.activityCount];
+    	int[][] activityEventEdge = new int[MainFrame.graphNet.activityCount][MainFrame.graphNet.activityCount];
+    	
+    	int lastActivityId = -1;
+    	String lastCase = "";
+    	Date lastDate = new Date();
+    	int[] temp = MainFrame.graphNet.activityFre.clone();
+		Arrays.sort(temp);
+		
+    	for (int i = 0 ; i < MainFrame.eventCollection.getSize(); i++){
+    		
+    		Event event = MainFrame.eventCollection
+					.getEvent(i);
+    		String caseName = event.getCase();
+    		String activityName = event.getActivity();
+    		int activityId = MainFrame.graphNet
+					.getActivityId(activityName);
+			if (MainFrame.graphNet.activityFre[activityId] < temp[activitySlider
+			                      						.getValue()]) {
+				continue;
+			}
+    		if (event.getStartDate().getTime()/ (1000*60*60) <= currentTime && 
+    		        event.getEndDate().getTime()/ (1000*60*60) >= currentTime){
+    			//graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "yellow", new Object[]{v[activityId]}); 
+    			activityEvent[activityId]++;
+    		}
+    		
+    		if (caseName.equals(lastCase)){
+    			if (event.getStartDate().getTime()/ (1000*60*60) >= currentTime && 
+        				lastDate.getTime()/ (1000*60*60) <= currentTime){
+    				activityEventEdge[lastActivityId][activityId]++;
+    			}
+    		}
+    		
+    		lastCase = caseName;
+    		lastDate = event.getEndDate();
+    		lastActivityId = activityId;
+    	}
+    	
+    	for (int i = 2; i< MainFrame.graphNet.activityCount; i++)
+    		if (MainFrame.graphNet.activityFre[i] >= temp[activitySlider
+    		                      						.getValue()])
+    	{
+    		graph.cellLabelChanged(v[i], MainFrame.graphNet.activityNames[i] + "\n"+activityEvent[i], false);
+    		if (activityEvent[i] > 0){
+    			int g = activityEvent[i];
+    		//	System.out.println(g);
+    			if (g > 100){
+    				g = 0; 
+    			} else{
+    				g = 200-g*2;
+    			}
+    			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, toHexEncoding(new Color(255,g,0)), new Object[]{v[i]}); 
+    		} else{
+    			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "#BFEFFF",new Object[]{v[i]}); 
+    		}
+    	}
+        	
+    	for (int i = 0; i< MainFrame.graphNet.activityCount;i++)
+    	if (i < 2 || (MainFrame.graphNet.activityFre[i] >= temp[activitySlider
+			               								.getValue()])){
+    		for (int j = 0; j< MainFrame.graphNet.activityCount; j++){
+    			if (j < 2 || (MainFrame.graphNet.activityFre[j] >= temp[activitySlider
+    			               								.getValue()]
+    			               								&& MainFrame.graphNet.activityQueFre[i][j] >= MainFrame.graphNet.activityQueFreSort.
+    			               								get(pathSlider.getValue()) && MainFrame.graphNet.activityQueFre[i][j] >= 0)){ 
+    				for (Object edge : graph.getEdgesBetween(v[i], v[j])){
+   						graph.cellLabelChanged(edge, activityEventEdge[i][j], false);
+    				}
+    				
+    				if(   activityEventEdge[i][j] > 0 ){
+    					int g = activityEventEdge[i][j];
+            			if (g > 40){
             				g = 0; 
             			} else{
-            				g = 200-g*2;
+            				g = 200-g*5;
             			}
-            			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, toHexEncoding(new Color(255,g,0)), new Object[]{v[i]}); 
-            		} else{
-            			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "#BFEFFF",new Object[]{v[i]}); 
-            		}
-            	}
-	            	
-            	for (int i = 0; i< MainFrame.graphNet.activityCount;i++)
-            	if (i < 2 || (MainFrame.graphNet.activityFre[i] >= temp[activitySlider
-     			               								.getValue()])){
-            		for (int j = 0; j< MainFrame.graphNet.activityCount; j++){
-            			if (j < 2 || (MainFrame.graphNet.activityFre[j] >= temp[activitySlider
-            			               								.getValue()]
-            			               								&& MainFrame.graphNet.activityQueFre[i][j] >= MainFrame.graphNet.activityQueFreSort.
-            			               								get(pathSlider.getValue()) && MainFrame.graphNet.activityQueFre[i][j] >= 0)){ 
-            				for (Object edge : graph.getEdgesBetween(v[i], v[j])){
-           						graph.cellLabelChanged(edge, activityEventEdge[i][j], false);
-            				}
-            				
-            				if(   activityEventEdge[i][j] > 0 ){
-            					int g = activityEventEdge[i][j];
-                    			if (g > 40){
-                    				g = 0; 
-                    			} else{
-                    				g = 200-g*5;
-                    			}
-            					graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, toHexEncoding(new Color(255,g,0)),graph.getEdgesBetween(v[i], v[j]));
-            			
-            				} else{
-            					graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#515151",graph.getEdgesBetween(v[i], v[j]));
-            				}
-            			}
-            		}
-            	}
-            	
-
-        		graphComponent.refresh();
-            }
-        }, 0, 500);
+    					graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, toHexEncoding(new Color(255,g,0)),graph.getEdgesBetween(v[i], v[j]));
+    			
+    				} else{
+    					graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#515151",graph.getEdgesBetween(v[i], v[j]));
+    				}
+    			}
+    		}
+    	}
+		graphComponent.refresh();
+    }
+    
+	//动画模拟函数
+	public void startAnimation(){
+		timer = new Timer();
+		setTimerTask();
+        timer.scheduleAtFixedRate(timerTask, 0, 500);
 	}
 	
 	
@@ -621,6 +780,7 @@ public class MapPanel extends JPanel implements ComponentListener {
 	public void componentShown(ComponentEvent e) {
 		// TODO Auto-generated method stub
 		ZoomtoFit();
+		animationSlider.setPreferredSize(new Dimension(MainFrame.mainFrame.getWidth() - 100, 40));
 	}
 
 	
@@ -635,6 +795,8 @@ public class MapPanel extends JPanel implements ComponentListener {
 	public void componentResized(ComponentEvent e) {
 		// TODO Auto-generated method stub
 		ZoomtoFit();
+		animationSlider.setPreferredSize(new Dimension(400, 40));
+		animationSlider.setPreferredSize(new Dimension(MainFrame.mainFrame.getWidth() - 100, 40));
 	}
 
 	

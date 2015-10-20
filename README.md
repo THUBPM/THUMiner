@@ -18,3 +18,7 @@ Automatically get encodings.
 v0.9.4.2 2015/10/16
 Fix the bug that the num on edges form vertex begin and to vertex end in animation;
 Fix the bug that all edges is 0 sometimes after animation.
+
+v0.9.5 2015/10/20
+Add pause and continue in animation;
+Add seek bar in animation.
