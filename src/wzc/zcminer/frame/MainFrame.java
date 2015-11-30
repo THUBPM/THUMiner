@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Properties;
 
 import javax.swing.*;
@@ -42,9 +45,14 @@ public class MainFrame {
 	static MeanWaitingTimeChart meanWaitingTimeChart;
 	static ActivityCollection activityCollection;
 	static ResourceCollection resourceCollection;
+	static int dataSource = 0; //0:file 1:database
+	static Connection connection = null;
+	static PreparedStatement statement = null;
+	static ResultSet result = null;
 
 	static JFrame mainFrame;
 	static FileButton fileButton;
+	static DatabaseButton databaseButton;
 	
 	static Properties properties;
 	static String filename;
@@ -63,6 +71,7 @@ public class MainFrame {
 		mainFrame.setContentPane(startPanel);
 
 		fileButton = new FileButton();
+		databaseButton = new DatabaseButton();
 
 		startPanel.setLayout(new BorderLayout());
 
@@ -77,6 +86,7 @@ public class MainFrame {
 			radioPanel.add(new JLabel("开始导入："));
 		}
 		radioPanel.add(fileButton);
+		radioPanel.add(databaseButton);
 		startPanel.add(radioPanel, BorderLayout.CENTER);
 		
 		mainFrame.setVisible(true);

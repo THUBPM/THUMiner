@@ -8,6 +8,7 @@ import javax.swing.*;
 //切换界面
 public class ButtonPanel extends JPanel{
 	static FileButton fileButton;
+	static DatabaseButton databaseButton;
 	static JButton mapButton;
 	static JButton staticsButton;
 	static JButton casesButton;
@@ -16,6 +17,7 @@ public class ButtonPanel extends JPanel{
 		super();
 		
 		fileButton = new FileButton();
+		databaseButton = new DatabaseButton();
 
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
@@ -75,6 +77,7 @@ public class ButtonPanel extends JPanel{
         });
 
 		add(fileButton);
+		add(databaseButton);
         add(mapButton);
         add(staticsButton);
         add(casesButton);

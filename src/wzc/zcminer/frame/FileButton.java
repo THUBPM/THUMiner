@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
@@ -48,9 +49,34 @@ public class FileButton extends JButton{
 		//导入数据文件
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					UIManager.put("FileChooser.cancelButtonText", "Cancel");
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					UIManager.put("FileChooser.cancelButtonText", "取消");
+				}
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					UIManager.put("FileChooser.openButtonText", "Open");
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					UIManager.put("FileChooser.openButtonText", "打开");
+				}
+				
 				JFileChooser fd = new JFileChooser();
 				fd.setCurrentDirectory(new File("."));
 				fd.setAcceptAllFileFilterUsed(false);
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					fd.setDialogTitle("Select file");
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					fd.setDialogTitle("选择文件");
+				}
 				final String[][] fileENames;
 				fileENames = new String[4][2];
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
@@ -173,14 +199,6 @@ public class FileButton extends JButton{
         		filePropoties.add(tableHead);
         		fd.add(filePropoties, 3);
         		
-				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-				{
-					fd.setApproveButtonText("Open");
-				}
-				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-				{
-					fd.setApproveButtonText("打开");
-				}
         		fd.setPreferredSize(new Dimension(510, 340));
                 int result = fd.showOpenDialog(new JLabel());
                 if(result == JFileChooser.CANCEL_OPTION)
@@ -191,6 +209,17 @@ public class FileButton extends JButton{
                 {
                     File file = fd.getSelectedFile();
                     if (file!=null){
+						try {
+					        if (MainFrame.result != null)
+					        	MainFrame.result.close();
+					        if (MainFrame.statement != null)
+					        	MainFrame.statement.close();
+							if (MainFrame.connection != null)
+								MainFrame.connection.close();
+		                } catch (Exception e1) {
+		                    e1.printStackTrace();
+		                }
+						
                         MainFrame.eventCollection = new EventCollection();
                         MainFrame.graphNet = new GraphNet();
                         MainFrame.variantCollection = new VariantCollection();
@@ -211,6 +240,8 @@ public class FileButton extends JButton{
     					MainFrame.mainFrame.setContentPane(importPanel);
     					MainFrame.mainFrame.setVisible(true);
     					System.gc();
+    					
+    					MainFrame.dataSource = 0;
                     }
                 }
 			}

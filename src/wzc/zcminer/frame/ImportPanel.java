@@ -52,16 +52,16 @@ public class ImportPanel extends JPanel {
 	static JRadioButton otherButton;
 	static ButtonGroup buttonGroup;
 	static FileButton fileButton;
+	static DatabaseButton databaseButton;
 	static JTextField timeText; //时间模式输入
 	static JButton okButton;
 	final static int MAXHEADINDEX = 20;
 	int[] headIndex;
 	String[][] rowData;
-	List<String[]> myEntries;
 	
 	int maxLine;
 
-	public ImportPanel(String dataName, char separator, boolean hasTableHead, String encodingText) {
+	public ImportPanel(String fileName, char separator, boolean hasTableHead, String encodingText) {
 		// TODO Auto-generated constructor stub
 		try {
 			headIndex = new int[MAXHEADINDEX];
@@ -127,7 +127,7 @@ public class ImportPanel extends JPanel {
 			});
 			//时间模板输入
 			timeText = new JTextField(12);
-			timeText.setText(MainFrame.properties.getProperty("timestamp", "dd.MM.yy HH:mm"));
+			timeText.setText(MainFrame.properties.getProperty("file_timestamp", "dd.MM.yy HH:mm"));
 			//timeText.setText("dd.MM.yy HH:mm");
 			//timeText.setText("dd/MM/yyyy HH:mm:ss");
 			//timeText.setText("yyyy-MM-dd HH:mm:ss");
@@ -161,8 +161,10 @@ public class ImportPanel extends JPanel {
 			});
 
 			fileButton = new FileButton();
+			databaseButton = new DatabaseButton();
 
 	        radioPanel.add(fileButton);
+	        radioPanel.add(databaseButton);
 			radioPanel.add(removeButton);
 			radioPanel.add(otherButton);
 			radioPanel.add(caseButton);
@@ -188,10 +190,12 @@ public class ImportPanel extends JPanel {
 			buttonGroup.add(otherButton);
 			add(radioPanel, BorderLayout.PAGE_START);
 			
-			if(dataName.endsWith(".xls") || dataName.endsWith(".xlsx"))
+			
+			List<String[]> myEntries;
+			if(fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))
 			{
-			    String fileType = dataName.substring(dataName.lastIndexOf(".") + 1, dataName.length());
-			    InputStream stream = new FileInputStream(dataName);
+			    String fileType = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+			    InputStream stream = new FileInputStream(fileName);
 			    Workbook wb = null;
 			    if(fileType.equals("xls")) {
 			    	wb = new HSSFWorkbook(stream);
@@ -216,7 +220,7 @@ public class ImportPanel extends JPanel {
 			else
 			{
 				//csv数据导入
-				DataInputStream input = new DataInputStream(new FileInputStream(new File(dataName)));
+				DataInputStream input = new DataInputStream(new FileInputStream(new File(fileName)));
 				CSVReader reader = new CSVReader(new InputStreamReader(input, encodingText), separator);
 				myEntries = reader.readAll();
 				reader.close();
@@ -339,6 +343,291 @@ public class ImportPanel extends JPanel {
 		}
 	}
 
+	
+	public ImportPanel(String db_table) {
+		// TODO Auto-generated constructor stub
+		try {
+			headIndex = new int[MAXHEADINDEX];
+			//按钮组的设置
+			setLayout(new BorderLayout());
+			radioPanel = new JPanel();
+			radioPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				removeButton = new JRadioButton("Remove");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				removeButton = new JRadioButton("移除");
+			}
+			removeButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					headIndex[table.column] = 1;
+				}
+			});
+
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				caseButton = new JRadioButton("Case");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				caseButton = new JRadioButton("实例");
+			}
+			caseButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					headIndex[table.column] = 2;
+				}
+			});
+
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				activityButton = new JRadioButton("Activity");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				activityButton = new JRadioButton("活动");
+			}
+			activityButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					headIndex[table.column] = 3;
+				}
+			});
+
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				timeButton = new JRadioButton("Timestamp");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				timeButton = new JRadioButton("时间");
+			}
+			timeButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					headIndex[table.column] = 4;
+				}
+			});
+			
+			//时间模板输入
+			timeText = new JTextField(12);
+			timeText.setText(MainFrame.properties.getProperty("database_timestamp", "yyyy-MM-dd HH:mm:00.0"));
+			//timeText.setText("dd.MM.yy HH:mm");
+			//timeText.setText("dd/MM/yyyy HH:mm:ss");
+			//timeText.setText("yyyy-MM-dd HH:mm:ss");
+			
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				resourseButton = new JRadioButton("Resourse");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				resourseButton = new JRadioButton("资源");
+			}
+			resourseButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					headIndex[table.column] = 5;
+				}
+			});
+
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				otherButton = new JRadioButton("Other");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				otherButton = new JRadioButton("其他");
+			}
+			otherButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					headIndex[table.column] = 6;
+				}
+			});
+
+			fileButton = new FileButton();
+			databaseButton = new DatabaseButton();
+
+	        radioPanel.add(fileButton);
+	        radioPanel.add(databaseButton);
+			radioPanel.add(removeButton);
+			radioPanel.add(otherButton);
+			radioPanel.add(caseButton);
+			radioPanel.add(activityButton);
+			radioPanel.add(resourseButton);
+			radioPanel.add(timeButton);
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				radioPanel.add(new JLabel("Timestamp pattern: "));
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				radioPanel.add(new JLabel("时间格式："));
+			}
+			radioPanel.add(timeText);
+
+			buttonGroup = new ButtonGroup();
+			buttonGroup.add(removeButton);
+			buttonGroup.add(caseButton);
+			buttonGroup.add(activityButton);
+			buttonGroup.add(timeButton);
+			buttonGroup.add(resourseButton);
+			buttonGroup.add(otherButton);
+			add(radioPanel, BorderLayout.PAGE_START);
+			
+			
+			List<String[]> myEntries = new ArrayList<String[]>();
+
+            try {
+            	String count_sql = "select count(column_name) from user_tab_columns where table_name='" + db_table + "'";
+            	MainFrame.statement = MainFrame.connection.prepareStatement(count_sql);
+                MainFrame.result = MainFrame.statement.executeQuery();
+                int column_count = 0;
+                while (MainFrame.result.next())
+                {
+                	column_count = MainFrame.result.getInt(1);
+                }
+		        if (MainFrame.result != null)
+		        	MainFrame.result.close();
+		        if (MainFrame.statement != null)
+		        	MainFrame.statement.close();
+		        
+            	String header_sql = "select column_name from user_tab_columns where table_name='" + db_table + "'";
+            	MainFrame.statement = MainFrame.connection.prepareStatement(header_sql);
+                MainFrame.result = MainFrame.statement.executeQuery();
+                String[] temp = new String[column_count];
+                int count = 0;
+                while (MainFrame.result.next())
+                {
+                    temp[count] = MainFrame.result.getString(1);
+                    count++;
+                }
+                myEntries.add(temp);
+		        if (MainFrame.result != null)
+		        	MainFrame.result.close();
+		        if (MainFrame.statement != null)
+		        	MainFrame.statement.close();
+		        
+            	String data_sql = "select * from " + db_table + " order by case";
+            	MainFrame.statement = MainFrame.connection.prepareStatement(data_sql);
+                MainFrame.result = MainFrame.statement.executeQuery();
+                while (MainFrame.result.next())
+                {
+                    temp = new String[column_count];
+                    for(int i = 0; i < column_count; i++)
+                    	temp[i] = MainFrame.result.getString(myEntries.get(0)[i]);
+                    myEntries.add(temp);
+                }
+		        if (MainFrame.result != null)
+		        	MainFrame.result.close();
+		        if (MainFrame.statement != null)
+		        	MainFrame.statement.close();
+		        if (MainFrame.connection != null)
+		        	MainFrame.connection.close();
+
+		    } catch (Exception e1) {
+		    	e1.printStackTrace();
+		    }
+			
+			String[] headlines;
+			headlines = myEntries.remove(0);
+
+			//rowData = myEntries.toArray(new String[0][]);
+			maxLine = 1000;
+			if (myEntries.size() < maxLine){
+				maxLine = myEntries.size();
+			}
+			String [][] tableData = myEntries.subList(0, maxLine).toArray(new String[0][]);
+	        maxLine = 2500000;
+	        if (myEntries.size() < maxLine){
+	            maxLine = myEntries.size();
+	        }
+			rowData = myEntries.subList(0, maxLine).toArray(new String[0][]);
+			
+			myEntries = null;
+			
+			table = new ColumnSelectableJTable(tableData, headlines);
+
+			table.addMouseListener(new MouseAdapter() {
+				public void mouseReleased(MouseEvent e) {
+					int column = table.getSelectedColumn();
+					table.column = column;
+					switch (headIndex[column]) {
+					case 1:
+						buttonGroup.setSelected(removeButton.getModel(), true);
+						break;
+					case 2:
+						buttonGroup.setSelected(caseButton.getModel(), true);
+						break;
+					case 3:
+						buttonGroup.setSelected(activityButton.getModel(), true);
+						break;
+					case 4:
+						buttonGroup.setSelected(timeButton.getModel(), true);
+						break;
+					case 5:
+						buttonGroup.setSelected(resourseButton.getModel(), true);
+						break;
+					case 6:
+						buttonGroup.setSelected(otherButton.getModel(), true);
+						break;
+					default:
+						buttonGroup.clearSelection();
+						break;
+					}
+				}
+			});
+
+			JScrollPane dataPanel = new JScrollPane(table);
+			add(dataPanel, BorderLayout.CENTER);
+			//逻辑分析代码，得出所有信息
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+				okButton = new JButton("Start import");
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+				okButton = new JButton("开始导入");
+			}
+			okButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+
+				    setEventCollection();
+				    mergeEventCollection();
+				    
+				    MainFrame.mainFrame.getContentPane().removeAll();
+				    rowData = null;
+				    headIndex = null;
+                    System.gc();
+				    
+				    setGraphNet();
+				    setCaseCollection();
+				    setVariantCollection();
+				    setEventsOverTimeChart();
+				    setActiveCasesOverTimeChart();
+				    setEventsPerCaseChart();
+				    setCaseDurationChart();
+				    setCaseUtilizationChart();
+				    setMeanActivityDurationChart();
+				    setMeanWaitingTimeChart();
+				    setActivityCollection();
+				    setResourceCollection();
+					
+					MainFrame.mainFrame.getContentPane().removeAll();
+					System.gc();
+					MapPanel mapPanel = new MapPanel();
+					MainFrame.mainFrame.setContentPane(mapPanel);
+					MainFrame.mainFrame.setVisible(true);
+					System.gc();
+				}
+			});
+
+			add(okButton, BorderLayout.PAGE_END);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	
 	//更新event集
     public void setEventCollection() {
