@@ -111,6 +111,12 @@ public class Event {
 			//this.endDateString = dateString;
 			try {
 				endDate = sdf.parse(dateString);
+				if(endDate.before(startDate))
+				{
+					Date temp = startDate;
+					startDate = endDate;
+					endDate = temp;
+				}
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
