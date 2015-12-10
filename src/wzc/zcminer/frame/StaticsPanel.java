@@ -48,6 +48,7 @@ import org.jfree.chart.renderer.xy.XYAreaRenderer;
 import wzc.zcminer.global.Activity;
 import wzc.zcminer.global.Case;
 import wzc.zcminer.global.Resource;
+import wzc.zcminer.global.RowSelectableJTable;
 import wzc.zcminer.global.Variant;
 
 //statics面板
@@ -181,11 +182,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
     static JTabbedPane overviewTablePanel;
     //overview-case表格显示
     static JComponent overviewCaseTablePanel;
-    static JTable overviewCaseTable;
+    static RowSelectableJTable overviewCaseTable;
     static DefaultTableModel overviewCaseTableModel;
     //overview-variant表格显示
     static JComponent overviewVariantTablePanel;
-    static JTable overviewVariantTable;
+    static RowSelectableJTable overviewVariantTable;
     static DefaultTableModel overviewVariantTableModel;
     
     //activity
@@ -194,15 +195,15 @@ public class StaticsPanel extends JPanel implements ComponentListener {
     static JTabbedPane activityTablePanel;
     //activity-all activities表格显示
     static JComponent activityAllActivitiesTablePanel;
-    static JTable activityAllActivitiesTable;
+    static RowSelectableJTable activityAllActivitiesTable;
     static DefaultTableModel activityAllActivitiesTableModel;
     //activity-first in case表格显示
     static JComponent activityFirstInCaseTablePanel;
-    static JTable activityFirstInCaseTable;
+    static RowSelectableJTable activityFirstInCaseTable;
     static DefaultTableModel activityFirstInCaseTableModel;
     //activity-last in case表格显示
     static JComponent activityLastInCaseTablePanel;
-    static JTable activityLastInCaseTable;
+    static RowSelectableJTable activityLastInCaseTable;
     static DefaultTableModel activityLastInCaseTableModel;
     //activity统计版面
     static JPanel activityStaticPanel;
@@ -243,15 +244,15 @@ public class StaticsPanel extends JPanel implements ComponentListener {
     static JTabbedPane resourceTablePanel;
     //resource-all resources表格显示
     static JComponent resourceAllResourcesTablePanel;
-    static JTable resourceAllResourcesTable;
+    static RowSelectableJTable resourceAllResourcesTable;
     static DefaultTableModel resourceAllResourcesTableModel;
     //resource-first in case表格显示
     static JComponent resourceFirstInCaseTablePanel;
-    static JTable resourceFirstInCaseTable;
+    static RowSelectableJTable resourceFirstInCaseTable;
     static DefaultTableModel resourceFirstInCaseTableModel;
     //resource-last in case表格显示
     static JComponent resourceLastInCaseTablePanel;
-    static JTable resourceLastInCaseTable;
+    static RowSelectableJTable resourceLastInCaseTable;
     static DefaultTableModel resourceLastInCaseTableModel;
     //resource统计版面
     static JPanel resourceStaticPanel;
@@ -393,9 +394,9 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 		overviewStaticPanel.add(overviewLabelPanel, BorderLayout.EAST);
 		overviewStaticPanel.add(overviewChartPanel, BorderLayout.CENTER);
 		
-		overviewCaseTable = new JTable();
+		overviewCaseTable = new RowSelectableJTable();
 		overviewCaseTablePanel = new JScrollPane(overviewCaseTable);
-        overviewVariantTable = new JTable();
+        overviewVariantTable = new RowSelectableJTable();
 		overviewVariantTablePanel = new JScrollPane(overviewVariantTable);
         overviewTablePanel = new JTabbedPane();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
@@ -487,11 +488,11 @@ public class StaticsPanel extends JPanel implements ComponentListener {
 		activityStaticPanel.add(activityLabelPanel, BorderLayout.EAST);
 		activityStaticPanel.add(activityChartPanel, BorderLayout.CENTER);
 		
-		activityAllActivitiesTable = new JTable();
+		activityAllActivitiesTable = new RowSelectableJTable();
 		activityAllActivitiesTablePanel = new JScrollPane(activityAllActivitiesTable);
-		activityFirstInCaseTable = new JTable();
+		activityFirstInCaseTable = new RowSelectableJTable();
         activityFirstInCaseTablePanel = new JScrollPane(activityFirstInCaseTable);
-        activityLastInCaseTable = new JTable();
+        activityLastInCaseTable = new RowSelectableJTable();
         activityLastInCaseTablePanel = new JScrollPane(activityLastInCaseTable);
         activityTablePanel = new JTabbedPane();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
@@ -584,12 +585,12 @@ public class StaticsPanel extends JPanel implements ComponentListener {
         resourceStaticPanel = new JPanel(new BorderLayout());
         resourceStaticPanel.add(resourceLabelPanel, BorderLayout.EAST);
         resourceStaticPanel.add(resourceChartPanel, BorderLayout.CENTER);
-        
-        resourceAllResourcesTable = new JTable();
+
+        resourceAllResourcesTable = new RowSelectableJTable();
         resourceAllResourcesTablePanel = new JScrollPane(resourceAllResourcesTable);
-        resourceFirstInCaseTable = new JTable();
+        resourceFirstInCaseTable = new RowSelectableJTable();
         resourceFirstInCaseTablePanel = new JScrollPane(resourceFirstInCaseTable);
-        resourceLastInCaseTable = new JTable();
+        resourceLastInCaseTable = new RowSelectableJTable();
         resourceLastInCaseTablePanel = new JScrollPane(resourceLastInCaseTable);
         resourceTablePanel = new JTabbedPane();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))

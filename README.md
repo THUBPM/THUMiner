@@ -29,3 +29,6 @@ Database supported.
 v0.9.6.2 2015/12/6
 Fix the bug that end date occur befor start date;
 Optimize the encapsulation.
+
+v0.9.7 2015/12/10
+Add multi-tables selection in database.

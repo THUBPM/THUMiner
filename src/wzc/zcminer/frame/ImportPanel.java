@@ -129,7 +129,8 @@ public class ImportPanel extends JPanel {
 	public ImportPanel(String db_table) {
 		// TODO Auto-generated constructor stub
 		try {
-			myEntries = new ArrayList<String[]>();         	String count_sql = "select count(column_name) from user_tab_columns where table_name='" + db_table + "'";
+			myEntries = new ArrayList<String[]>();
+         	String count_sql = "select count(column_name) from user_tab_columns where table_name='" + db_table + "'";
          	MainFrame.statement = MainFrame.connection.prepareStatement(count_sql);
             MainFrame.result = MainFrame.statement.executeQuery();
             int column_count = 0;
@@ -141,7 +142,7 @@ public class ImportPanel extends JPanel {
             	MainFrame.result.close();
             if (MainFrame.statement != null)
             	MainFrame.statement.close();
-		        
+		    
          	String header_sql = "select column_name from user_tab_columns where table_name='" + db_table + "'";
          	MainFrame.statement = MainFrame.connection.prepareStatement(header_sql);
             MainFrame.result = MainFrame.statement.executeQuery();
@@ -158,14 +159,119 @@ public class ImportPanel extends JPanel {
 		    if (MainFrame.statement != null)
 		       	MainFrame.statement.close();
 		        
-         	String data_sql = "select * from " + db_table + " order by case";
+         	String data_sql = "select * from " + db_table;
          	MainFrame.statement = MainFrame.connection.prepareStatement(data_sql);
             MainFrame.result = MainFrame.statement.executeQuery();
             while (MainFrame.result.next())
             {
                 temp = new String[column_count];
                 for(int i = 0; i < column_count; i++)
-               	temp[i] = MainFrame.result.getString(myEntries.get(0)[i]);
+                	temp[i] = MainFrame.result.getString(myEntries.get(0)[i]);
+                myEntries.add(temp);
+            }
+		    if (MainFrame.result != null)
+		       	MainFrame.result.close();
+		    if (MainFrame.statement != null)
+		       	MainFrame.statement.close();
+		    if (MainFrame.connection != null)
+		       	MainFrame.connection.close();
+            
+			headlines = myEntries.remove(0);
+			setPanel("database_timestamp");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	
+	public ImportPanel(String[] tableList, String[] tableEventidList) {
+		// TODO Auto-generated constructor stub
+		try {			
+			myEntries = new ArrayList<String[]>();
+			int column_count = 0;
+			for(int i = 0; i < tableList.length; i++)
+			{
+				String table = tableList[i].toUpperCase();
+				String tableEventid = tableEventidList[i].toUpperCase();
+				if(table == null) table = "";
+				if(tableEventid == null) table = "";
+				if(!table.equals("") && !tableEventid.equals(""))
+				{
+		         	String count_sql = "select count(column_name) from user_tab_columns where table_name='" + table + "'";
+		         	MainFrame.statement = MainFrame.connection.prepareStatement(count_sql);
+		            MainFrame.result = MainFrame.statement.executeQuery();
+		            while (MainFrame.result.next())
+		            {
+		            	column_count += (MainFrame.result.getInt(1) - 1);
+		            }
+		            if (MainFrame.result != null)
+		            	MainFrame.result.close();
+		            if (MainFrame.statement != null)
+		            	MainFrame.statement.close();
+	            }
+		    }
+
+            String[] temp = new String[column_count];
+            String[][] tableHeader = new String[tableList.length][column_count];
+            int count = 0;
+			for(int i = 0; i < tableList.length; i++)
+			{
+				String table = tableList[i].toUpperCase();
+				String tableEventid = tableEventidList[i].toUpperCase();
+				if(table == null) table = "";
+				if(tableEventid == null) table = "";
+				if(!table.equals("") && !tableEventid.equals(""))
+				{
+		         	String header_sql = "select column_name from user_tab_columns where table_name='" + table + "'";
+		         	MainFrame.statement = MainFrame.connection.prepareStatement(header_sql);
+		            MainFrame.result = MainFrame.statement.executeQuery();
+		            int tableColumnCount = 0;
+		            while (MainFrame.result.next())
+		            {
+		                String columnName = MainFrame.result.getString(1);
+		                if(!columnName.equals(tableEventid))
+		                {
+		                	temp[count] = columnName;
+		                	tableHeader[i][tableColumnCount] = columnName;
+		                	tableColumnCount++;
+		                	count++;
+		                }
+		            }
+				    if (MainFrame.result != null)
+				      	MainFrame.result.close();
+				    if (MainFrame.statement != null)
+				       	MainFrame.statement.close();
+		       	}
+		    }
+		    myEntries.add(temp);
+		    
+		    String data_sql_table = "";
+		    String data_sql_condition = "";
+		    String a0_eventid = "";
+		    for(int i = 0; i < tableList.length; i++)
+			{
+				String table = tableList[i].toUpperCase();
+				String tableEventid = tableEventidList[i].toUpperCase();
+				if(table == null) table = "";
+				if(tableEventid == null) table = "";
+				if(!table.equals("") && !tableEventid.equals(""))
+				{
+					if(a0_eventid.equals(""))
+						a0_eventid = tableEventid;
+		         	data_sql_table += (table + " a" + i + ",");
+		         	data_sql_condition += ("a0." + a0_eventid + "=a" + i + "." + tableEventid + " and ");
+				}
+		    }
+		    data_sql_table = data_sql_table.substring(0, data_sql_table.length() - 1);
+		    data_sql_condition = data_sql_condition.substring(0, data_sql_condition.length() - 5);
+         	String data_sql = "select * from " + data_sql_table + " where " + data_sql_condition;
+         	MainFrame.statement = MainFrame.connection.prepareStatement(data_sql);
+            MainFrame.result = MainFrame.statement.executeQuery();
+            while (MainFrame.result.next())
+            {
+                temp = new String[column_count];
+                for(int j = 0; j < column_count; j++)
+                	temp[j] = MainFrame.result.getString(myEntries.get(0)[j]);
                 myEntries.add(temp);
             }
 		    if (MainFrame.result != null)
@@ -326,7 +432,6 @@ public class ImportPanel extends JPanel {
 		myEntries = null;
 		
 		table = new ColumnSelectableJTable(tableData, headlines);
-
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				int column = table.getSelectedColumn();

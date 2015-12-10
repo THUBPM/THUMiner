@@ -40,6 +40,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 
 import wzc.zcminer.global.Case;
 import wzc.zcminer.global.Event;
+import wzc.zcminer.global.RowSelectableJTable;
 import wzc.zcminer.global.Variant;
 
 import com.mxgraph.layout.mxParallelEdgeLayout;
@@ -88,7 +89,7 @@ public class CasesPanel extends JPanel implements ComponentListener {
     static JTabbedPane tabbedPanel;
     //表格显示
     static JComponent tablePanel;
-    static JTable table;
+    static RowSelectableJTable table;
     static DefaultTableModel tableModel;
     //图形显示
     mxGraphComponent graphPanel;
@@ -255,7 +256,7 @@ public class CasesPanel extends JPanel implements ComponentListener {
         selectPanel.add(variantsPanel, BorderLayout.WEST);
         selectPanel.add(casesPanel, BorderLayout.EAST);
         
-        table = new JTable();
+        table = new RowSelectableJTable();
         
         tablePanel = new JScrollPane(table);
         
