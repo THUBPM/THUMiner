@@ -32,3 +32,6 @@ Optimize the encapsulation.
 
 v0.9.7 2015/12/10
 Add multi-tables selection in database.
+
+v0.9.8 2015/12/13
+Add MongoDB.

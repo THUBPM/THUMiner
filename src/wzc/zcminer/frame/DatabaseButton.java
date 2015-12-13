@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
@@ -19,6 +20,13 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;
@@ -46,38 +54,60 @@ public class DatabaseButton extends JButton{
 	
 	static JTabbedPane tabbedPanel;
 	
-	static JPanel singleSelectPanel;
-	static JPanel singleLabelPanel;
-	static JPanel singleUrlLabelPanel;
-	static JTextField singleUrlText;
-	static JPanel singleTableLabelPanel;
-	static JTextField singleTableText;
-	static JPanel singleUserLabelPanel;
-	static JTextField singleUserText;
-	static JPanel singlePasswordLabelPanel;
-	static JPasswordField singlePasswordText;
-	static JPanel singleButtonPanel;
-	static JButton singleOkButton;
-	static JButton singleCancleButton;
+	static JTabbedPane oracleTabbedPanel;
 	
-	static JPanel multiSelectPanel;
-	static JPanel multiLabelPanel;
-	static JPanel multiUrlLabelPanel;
-	static JTextField multiUrlText;
-	static JPanel multiTableLabelPanel;
-	static JTable multiTable;
-	static JScrollPane multiTablePanel;
-	static JPanel multiUserLabelPanel;
-	static JTextField multiUserText;
-	static JPanel multiPasswordLabelPanel;
-	static JPasswordField multiPasswordText;
-	static JPanel multiButtonPanel;
-	static JButton multiOkButton;
-	static JButton multiCancleButton;
+	static JPanel oracleSingleSelectPanel;
+	static JPanel oracleSingleLabelPanel;
+	static JPanel oracleSingleUrlLabelPanel;
+	static JTextField oracleSingleUrlText;
+	static JPanel oracleSingleTableLabelPanel;
+	static JTextField oracleSingleTableText;
+	static JPanel oracleSingleUserLabelPanel;
+	static JTextField oracleSingleUserText;
+	static JPanel oracleSinglePasswordLabelPanel;
+	static JPasswordField oracleSinglePasswordText;
+	static JPanel oracleSingleButtonPanel;
+	static JButton oracleSingleOkButton;
+	static JButton oracleSingleCancleButton;
+	
+	static JPanel oracleMultiSelectPanel;
+	static JPanel oracleMultiLabelPanel;
+	static JPanel oracleMultiUrlLabelPanel;
+	static JTextField oracleMultiUrlText;
+	static JPanel oracleMultiTableLabelPanel;
+	static JTable oracleMultiTable;
+	static JScrollPane oracleMultiTablePanel;
+	static JPanel oracleMultiUserLabelPanel;
+	static JTextField oracleMultiUserText;
+	static JPanel oracleMultiPasswordLabelPanel;
+	static JPasswordField oracleMultiPasswordText;
+	static JPanel oracleMultiButtonPanel;
+	static JButton oracleMultiOkButton;
+	static JButton oracleMultiCancleButton;
+	
+	static JTabbedPane mongodbTabbedPanel;
+	
+	static JPanel mongodbSingleSelectPanel;
+	static JPanel mongodbSingleLabelPanel;
+	static JPanel mongodbSingleHostLabelPanel;
+	static JTextField mongodbSingleHostText;
+	static JPanel mongodbSinglePortLabelPanel;
+	static JTextField mongodbSinglePortText;
+	static JPanel mongodbSingleDBLabelPanel;
+	static JTextField mongodbSingleDBText;
+	static JPanel mongodbSingleCollectionLabelPanel;
+	static JTextField mongodbSingleCollectionText;
+	static JPanel mongodbSingleUserLabelPanel;
+	static JTextField mongodbSingleUserText;
+	static JPanel mongodbSinglePasswordLabelPanel;
+	static JPasswordField mongodbSinglePasswordText;
+	static JPanel mongodbSingleButtonPanel;
+	static JButton mongodbSingleOkButton;
+	static JButton mongodbSingleCancleButton;
 	
 	public DatabaseButton() {
 		super();
-		
+		 
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
 			setText("Select database");
@@ -89,7 +119,7 @@ public class DatabaseButton extends JButton{
 		//导入数据库表
 		addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JDialog jd = new JDialog() ;
+				JDialog jd = new JDialog();
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
 					jd.setTitle("Select database");
@@ -99,41 +129,42 @@ public class DatabaseButton extends JButton{
 					jd.setTitle("选择数据库");
 				}
 				
-				singleUrlText = new JTextField(30);
-				singleUrlText.setText(MainFrame.properties.getProperty("single_sql", "jdbc:oracle:thin:@//127.0.0.1:1521/ORCL"));
-				singleTableText = new JTextField(30);
-				singleTableText.setText(MainFrame.properties.getProperty("single_table", "THUMiner_test"));
-				singleUserText = new JTextField(30);
-				singleUserText.setText(MainFrame.properties.getProperty("single_user", "c##a"));
-				singlePasswordText = new JPasswordField(30);
-				singlePasswordText.setText(MainFrame.properties.getProperty("single_password", "abc"));
+				oracleSingleUrlText = new JTextField(30);
+				oracleSingleUrlText.setText(MainFrame.properties.getProperty("oracle_single_sql", "jdbc:oracle:thin:@//127.0.0.1:1521/ORCL"));
+				oracleSingleTableText = new JTextField(30);
+				oracleSingleTableText.setText(MainFrame.properties.getProperty("oracle_single_table", "THUMiner_test"));
+				oracleSingleUserText = new JTextField(30);
+				oracleSingleUserText.setText(MainFrame.properties.getProperty("oracle_single_user", "c##a"));
+				oracleSinglePasswordText = new JPasswordField(30);
 				
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					singleOkButton = new JButton("Connect");
+					oracleSingleOkButton = new JButton("Connect");
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					singleOkButton = new JButton("连接");
+					oracleSingleOkButton = new JButton("连接");
 				}
-				singleOkButton.addActionListener(new ActionListener() {
+				oracleSingleOkButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 		                String driver = "oracle.jdbc.driver.OracleDriver";
-		                String url = singleUrlText.getText();
-		                String table = singleTableText.getText();
-		                String username = singleUserText.getText();
-		                String password = singlePasswordText.getText();
+		                String url = oracleSingleUrlText.getText();
+		                String table = oracleSingleTableText.getText();
+		                String username = oracleSingleUserText.getText();
+		                String password = oracleSinglePasswordText.getText();
 
 						try {
-					        if (MainFrame.result != null)
-					        	MainFrame.result.close();
-					        if (MainFrame.statement != null)
-					        	MainFrame.statement.close();
-							if (MainFrame.connection != null)
-								MainFrame.connection.close();
+					        if (MainFrame.oracleResult != null)
+					        	MainFrame.oracleResult.close();
+					        if (MainFrame.oracleStatement != null)
+					        	MainFrame.oracleStatement.close();
+							if (MainFrame.oracleConnection != null)
+								MainFrame.oracleConnection.close();
+							if (MainFrame.mongoClient != null)
+								MainFrame.mongoClient.close();
 
 		                    Class.forName(driver);
-		                    MainFrame.connection = DriverManager.getConnection(url, username, password);
+		                    MainFrame.oracleConnection = DriverManager.getConnection(url, username, password);
 		                    
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
@@ -168,126 +199,133 @@ public class DatabaseButton extends JButton{
 				
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					singleCancleButton = new JButton("Cancle");
+					oracleSingleCancleButton = new JButton("Cancle");
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					singleCancleButton = new JButton("取消");
+					oracleSingleCancleButton = new JButton("取消");
 				}
-				singleCancleButton.addActionListener(new ActionListener() {
+				oracleSingleCancleButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						jd.dispose();
 					}
 				});
 				
-				singleUrlLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleSingleUrlLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					singleUrlLabelPanel.add(new JLabel("Url: "));
+					oracleSingleUrlLabelPanel.add(new JLabel("Url: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					singleUrlLabelPanel.add(new JLabel("数据库地址："));
+					oracleSingleUrlLabelPanel.add(new JLabel("数据库地址："));
 				}
-				singleUrlLabelPanel.add(singleUrlText);
+				oracleSingleUrlLabelPanel.add(oracleSingleUrlText);
 				
-				singleUserLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleSingleUserLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					singleUserLabelPanel.add(new JLabel("User Name: "));
+					oracleSingleUserLabelPanel.add(new JLabel("User Name: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					singleUserLabelPanel.add(new JLabel("用户名："));
+					oracleSingleUserLabelPanel.add(new JLabel("用户名："));
 				}
-				singleUserLabelPanel.add(singleUserText);
+				oracleSingleUserLabelPanel.add(oracleSingleUserText);
 				
-				singlePasswordLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleSinglePasswordLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					singlePasswordLabelPanel.add(new JLabel("Password: "));
+					oracleSinglePasswordLabelPanel.add(new JLabel("Password: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					singlePasswordLabelPanel.add(new JLabel("密码："));
+					oracleSinglePasswordLabelPanel.add(new JLabel("密码："));
 				}
-				singlePasswordLabelPanel.add(singlePasswordText);
+				oracleSinglePasswordLabelPanel.add(oracleSinglePasswordText);
 				
-				singleTableLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleSingleTableLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					singleTableLabelPanel.add(new JLabel("Table: "));
+					oracleSingleTableLabelPanel.add(new JLabel("Table: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					singleTableLabelPanel.add(new JLabel("表名："));
+					oracleSingleTableLabelPanel.add(new JLabel("表名："));
 				}
-				singleTableLabelPanel.add(singleTableText);
+				oracleSingleTableLabelPanel.add(oracleSingleTableText);
 				
-				singleButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
-				singleButtonPanel.add(singleOkButton);
-				singleButtonPanel.add(singleCancleButton);
+				oracleSingleButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleSingleButtonPanel.add(oracleSingleOkButton);
+				oracleSingleButtonPanel.add(oracleSingleCancleButton);
 				
-				singleLabelPanel = new JPanel(new GridLayout(0, 1));
-				singleLabelPanel.add(singleUrlLabelPanel);
-				singleLabelPanel.add(singleUserLabelPanel);
-				singleLabelPanel.add(singlePasswordLabelPanel);
-				singleLabelPanel.add(singleTableLabelPanel);
+				oracleSingleLabelPanel = new JPanel(new GridLayout(0, 1));
+				oracleSingleLabelPanel.add(oracleSingleUrlLabelPanel);
+				oracleSingleLabelPanel.add(oracleSingleUserLabelPanel);
+				oracleSingleLabelPanel.add(oracleSinglePasswordLabelPanel);
+				oracleSingleLabelPanel.add(oracleSingleTableLabelPanel);
 				
-				singleSelectPanel = new JPanel(new BorderLayout());
-				singleSelectPanel.add(singleLabelPanel, BorderLayout.CENTER);
-				singleSelectPanel.add(singleButtonPanel, BorderLayout.SOUTH);
+				oracleSingleSelectPanel = new JPanel(new BorderLayout());
+				oracleSingleSelectPanel.add(oracleSingleLabelPanel, BorderLayout.CENTER);
+				oracleSingleSelectPanel.add(oracleSingleButtonPanel, BorderLayout.SOUTH);
 
-				multiUrlText = new JTextField(30);
-				multiUrlText.setText(MainFrame.properties.getProperty("multi_sql", "jdbc:oracle:thin:@//127.0.0.1:1521/ORCL"));
-				multiUserText = new JTextField(30);
-				multiUserText.setText(MainFrame.properties.getProperty("multi_user", "c##a"));
-				multiPasswordText = new JPasswordField(30);
-				multiPasswordText.setText(MainFrame.properties.getProperty("multi_password", "abc"));
+				oracleMultiUrlText = new JTextField(30);
+				oracleMultiUrlText.setText(MainFrame.properties.getProperty("oracle_multi_sql", "jdbc:oracle:thin:@//127.0.0.1:1521/ORCL"));
+				oracleMultiUserText = new JTextField(30);
+				oracleMultiUserText.setText(MainFrame.properties.getProperty("oracle_multi_user", "c##a"));
+				oracleMultiPasswordText = new JPasswordField(30);
 				
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					multiOkButton = new JButton("Connect");
+					oracleMultiOkButton = new JButton("Connect");
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					multiOkButton = new JButton("连接");
+					oracleMultiOkButton = new JButton("连接");
 				}
-				multiOkButton.addActionListener(new ActionListener() {
+				oracleMultiOkButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 		                String driver = "oracle.jdbc.driver.OracleDriver";
-		                String url = multiUrlText.getText();
-		                String username = multiUserText.getText();
-		                String password = multiPasswordText.getText();
-		                String[] tableList = new String[5];
-		                String[] tableEventidList = new String[5];
-		                multiTable.editingStopped(changeEvent);
+		                String url = oracleMultiUrlText.getText();
+		                String username = oracleMultiUserText.getText();
+		                String password = oracleMultiPasswordText.getText();
+		                String[][] tableRelation = new String[5][4];
+		                oracleMultiTable.editingStopped(changeEvent);
 		                
-						for(int i = 0; i < multiTable.getRowCount(); i++) 
+						for(int i = 0; i < oracleMultiTable.getRowCount(); i++) 
 						{
-							String table = (String)multiTable.getValueAt(i, 0);
-							String tableEventid = (String)multiTable.getValueAt(i, 1);
-							if(table == null) table = "";
-							if(tableEventid == null) table = "";
-							if(table.equals("") ^ tableEventid.equals(""))
+							String table1 = (String)oracleMultiTable.getValueAt(i, 0);
+							String tableEventid1 = (String)oracleMultiTable.getValueAt(i, 1);
+							String table2 = (String)oracleMultiTable.getValueAt(i, 2);
+							String tableEventid2 = (String)oracleMultiTable.getValueAt(i, 3);
+							if(table1 == null) table1 = "";
+							if(tableEventid1 == null) tableEventid1 = "";
+							if(table2 == null) table2 = "";
+							if(tableEventid2 == null) tableEventid2 = "";
+							if(!((table1.equals("") && tableEventid1.equals("") && table2.equals("") && tableEventid2.equals(""))
+									|| (!table1.equals("") && !tableEventid1.equals("") && !table2.equals("") && !tableEventid2.equals(""))))
 							{
 								System.out.println("Table or Event Id is missing!");
 								return;
 							}
-							tableList[i] = table;
-							tableEventidList[i] = tableEventid;
+							tableRelation[i][0] = table1;
+							tableRelation[i][1] = tableEventid1;
+							tableRelation[i][2] = table2;
+							tableRelation[i][3] = tableEventid2;
 						}
 
 						try {
-					        if (MainFrame.result != null)
-					        	MainFrame.result.close();
-					        if (MainFrame.statement != null)
-					        	MainFrame.statement.close();
-							if (MainFrame.connection != null)
-								MainFrame.connection.close();
+					        if (MainFrame.oracleResult != null)
+					        	MainFrame.oracleResult.close();
+					        if (MainFrame.oracleStatement != null)
+					        	MainFrame.oracleStatement.close();
+							if (MainFrame.oracleConnection != null)
+								MainFrame.oracleConnection.close();
+							if (MainFrame.mongoClient != null)
+								MainFrame.mongoClient.close();
 
 		                    Class.forName(driver);
-		                    MainFrame.connection = DriverManager.getConnection(url, username, password);
+		                    MainFrame.oracleConnection = DriverManager.getConnection(url, username, password);
 		                    
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
@@ -305,7 +343,7 @@ public class DatabaseButton extends JButton{
 	                        
 	                        MainFrame.mainFrame.getContentPane().removeAll();
 	    					System.gc();
-	    					ImportPanel importPanel = new ImportPanel(tableList, tableEventidList);
+	    					ImportPanel importPanel = new ImportPanel(tableRelation);
 	    					MainFrame.mainFrame.setContentPane(importPanel);
 	    					MainFrame.mainFrame.setVisible(true);
 	    					System.gc();
@@ -322,118 +360,353 @@ public class DatabaseButton extends JButton{
 				
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					multiCancleButton = new JButton("Cancle");
+					oracleMultiCancleButton = new JButton("Cancle");
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					multiCancleButton = new JButton("取消");
+					oracleMultiCancleButton = new JButton("取消");
 				}
-				multiCancleButton.addActionListener(new ActionListener() {
+				oracleMultiCancleButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						jd.dispose();
 					}
 				});
 				
-				multiUrlLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleMultiUrlLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					multiUrlLabelPanel.add(new JLabel("Url: "));
+					oracleMultiUrlLabelPanel.add(new JLabel("Url: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					multiUrlLabelPanel.add(new JLabel("数据库地址："));
+					oracleMultiUrlLabelPanel.add(new JLabel("数据库地址："));
 				}
-				multiUrlLabelPanel.add(multiUrlText);
+				oracleMultiUrlLabelPanel.add(oracleMultiUrlText);
 				
-				multiUserLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleMultiUserLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					multiUserLabelPanel.add(new JLabel("User Name: "));
+					oracleMultiUserLabelPanel.add(new JLabel("User Name: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					multiUserLabelPanel.add(new JLabel("用户名："));
+					oracleMultiUserLabelPanel.add(new JLabel("用户名："));
 				}
-				multiUserLabelPanel.add(multiUserText);
+				oracleMultiUserLabelPanel.add(oracleMultiUserText);
 				
-				multiPasswordLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleMultiPasswordLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					multiPasswordLabelPanel.add(new JLabel("Password: "));
+					oracleMultiPasswordLabelPanel.add(new JLabel("Password: "));
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					multiPasswordLabelPanel.add(new JLabel("密码："));
+					oracleMultiPasswordLabelPanel.add(new JLabel("密码："));
 				}
-				multiPasswordLabelPanel.add(multiPasswordText);
+				oracleMultiPasswordLabelPanel.add(oracleMultiPasswordText);
 				
-				multiTableLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleMultiTableLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					multiTableLabelPanel.add(new JLabel("Please entering table name and event id for joining table (Double click to edit)"), BorderLayout.NORTH);
+					oracleMultiTableLabelPanel.add(new JLabel("Please entering table name and event id for joining table (Double click to edit)"), BorderLayout.NORTH);
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					multiTableLabelPanel.add(new JLabel("请输入表名和用于关联的事件编号（双击进行编辑）"), BorderLayout.NORTH);
+					oracleMultiTableLabelPanel.add(new JLabel("请输入表名和用于关联的事件编号（双击进行编辑）"), BorderLayout.NORTH);
 				}
 				
-				multiButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
-				multiButtonPanel.add(multiOkButton);
-				multiButtonPanel.add(multiCancleButton);
+				oracleMultiButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				oracleMultiButtonPanel.add(oracleMultiOkButton);
+				oracleMultiButtonPanel.add(oracleMultiCancleButton);
 				
-				multiLabelPanel = new JPanel(new GridLayout(0, 1));
-				multiLabelPanel.add(multiUrlLabelPanel);
-				multiLabelPanel.add(multiUserLabelPanel);
-				multiLabelPanel.add(multiPasswordLabelPanel);
-				multiLabelPanel.add(multiTableLabelPanel);
+				oracleMultiLabelPanel = new JPanel(new GridLayout(0, 1));
+				oracleMultiLabelPanel.add(oracleMultiUrlLabelPanel);
+				oracleMultiLabelPanel.add(oracleMultiUserLabelPanel);
+				oracleMultiLabelPanel.add(oracleMultiPasswordLabelPanel);
+				oracleMultiLabelPanel.add(oracleMultiTableLabelPanel);
 				
-				String[] headlines = new String[2];
+				String[] oracleHeadlines = new String[4];
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					headlines[0] = "Table";
-					headlines[1] = "Event Id";
+					oracleHeadlines[0] = "Table 1";
+					oracleHeadlines[1] = "Event Id 1";
+					oracleHeadlines[2] = "Table 2";
+					oracleHeadlines[3] = "Event Id 2";
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					headlines[0] = "表名";
-					headlines[1] = "事件编号";
+					oracleHeadlines[0] = "表名1";
+					oracleHeadlines[1] = "事件编号1";
+					oracleHeadlines[2] = "表名2";
+					oracleHeadlines[3] = "事件编号2";
 				}
 				
-				String multiTableList = MainFrame.properties.getProperty("multi_table", "THUMiner_join1,THUMiner_join2,THUMiner_join3,THUMiner_join4");
-				String multiTableEventidList = MainFrame.properties.getProperty("multi_table_eventid", "EventId,EventId,EventId,EventId");
-				String[] multiTableListArray = multiTableList.split(",");
-				String[] multiTableEventidListArray = multiTableEventidList.split(",");
-				String[][] tableData = new String[5][2];
+				String oracleMultiTableRelation = MainFrame.properties.getProperty("oracle_multi_table", "THUMiner_join1 EventId THUMiner_join2 EventId,THUMiner_join3 EventId THUMiner_join4 EventId,THUMiner_join4 EventId THUMiner_join2 EventId");
+				String[] oracleMultiTableRelationArray = oracleMultiTableRelation.split(",");
+				String[][] oracleTableData = new String[5][4];
 				for(int i = 0; i < 5; i++) 
 				{
-					tableData[i][0] = "";
-					tableData[i][1] = "";
+					oracleTableData[i][0] = "";
+					oracleTableData[i][1] = "";
+					oracleTableData[i][2] = "";
+					oracleTableData[i][3] = "";
 				}
-				for(int i = 0; i < multiTableListArray.length; i++) 
+				for(int i = 0; i < oracleMultiTableRelationArray.length; i++) 
 				{
-					tableData[i][0] = multiTableListArray[i];
-					tableData[i][1] = multiTableEventidListArray[i];
+					oracleTableData[i] = oracleMultiTableRelationArray[i].split(" ");
 				}
 				
-				multiTable = new JTable(tableData, headlines);
-				multiTablePanel = new JScrollPane(multiTable);
+				oracleMultiTable = new JTable(oracleTableData, oracleHeadlines);
+				oracleMultiTablePanel = new JScrollPane(oracleMultiTable);
 				
-				multiSelectPanel = new JPanel(new BorderLayout());
-				multiSelectPanel.add(multiLabelPanel, BorderLayout.NORTH);
-				multiSelectPanel.add(multiTablePanel, BorderLayout.CENTER);
-				multiSelectPanel.add(multiButtonPanel, BorderLayout.SOUTH);
+				oracleMultiSelectPanel = new JPanel(new BorderLayout());
+				oracleMultiSelectPanel.add(oracleMultiLabelPanel, BorderLayout.NORTH);
+				oracleMultiSelectPanel.add(oracleMultiTablePanel, BorderLayout.CENTER);
+				oracleMultiSelectPanel.add(oracleMultiButtonPanel, BorderLayout.SOUTH);
 
-				tabbedPanel = new JTabbedPane();
+				oracleTabbedPanel = new JTabbedPane();
 				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 				{
-					tabbedPanel.addTab("Single table", null, singleSelectPanel, "Single table");
-					tabbedPanel.addTab("Multi table", null, multiSelectPanel, "Multi table");
+					oracleTabbedPanel.addTab("Single table", null, oracleSingleSelectPanel, "Single table");
+					oracleTabbedPanel.addTab("Multi table", null, oracleMultiSelectPanel, "Multi table");
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
-					tabbedPanel.addTab("单表", null, singleSelectPanel, "单表");
-					tabbedPanel.addTab("多表", null, multiSelectPanel, "多表");
+					oracleTabbedPanel.addTab("单表", null, oracleSingleSelectPanel, "单表");
+					oracleTabbedPanel.addTab("多表", null, oracleMultiSelectPanel, "多表");
 				}
+				
+				oracleTabbedPanel.addChangeListener(new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e) {
+						// TODO Auto-generated method stub
+						if(oracleTabbedPanel.getSelectedIndex() == 0)
+						{
+			        		jd.setSize(new Dimension(510, 340));
+			                jd.setPreferredSize(new Dimension(510, 340));
+						}
+						else if(oracleTabbedPanel.getSelectedIndex() == 1)
+						{
+			        		jd.setSize(new Dimension(510, 504));
+			                jd.setPreferredSize(new Dimension(510, 504));
+						}
+		                int x = (Toolkit.getDefaultToolkit().getScreenSize().width - jd.getSize().width)/2;
+		                int y = (Toolkit.getDefaultToolkit().getScreenSize().height - jd.getSize().height)/2;
+		                jd.setLocation(x, y);
+					}
+				});
+				
+
+				mongodbSingleHostText = new JTextField(30);
+				mongodbSingleHostText.setText(MainFrame.properties.getProperty("mongo_single_host", "127.0.0.1"));
+				mongodbSinglePortText = new JTextField(30);
+				mongodbSinglePortText.setText(MainFrame.properties.getProperty("mongo_single_port", "27017"));
+				mongodbSingleDBText = new JTextField(30);
+				mongodbSingleDBText.setText(MainFrame.properties.getProperty("mongo_single_db", "thuminer"));
+				mongodbSingleCollectionText = new JTextField(30);
+				mongodbSingleCollectionText.setText(MainFrame.properties.getProperty("mongo_single_collection", "thuminer_test"));
+				mongodbSingleUserText = new JTextField(30);
+				mongodbSingleUserText.setText(MainFrame.properties.getProperty("mongodb_single_user", "abc"));
+				mongodbSinglePasswordText = new JPasswordField(30);
+
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSingleOkButton = new JButton("Connect");
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSingleOkButton = new JButton("连接");
+				}
+				mongodbSingleOkButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+		                String driver = "mongodb.jdbc.driver.OracleDriver";
+		                String host = mongodbSingleHostText.getText();
+		                String port = mongodbSinglePortText.getText();
+		                String dbName = mongodbSingleDBText.getText();
+		                String collectionName = mongodbSingleCollectionText.getText();
+		                String username = mongodbSingleUserText.getText();
+		                String password = mongodbSinglePasswordText.getText();
+
+						try {
+					        if (MainFrame.oracleResult != null)
+					        	MainFrame.oracleResult.close();
+					        if (MainFrame.oracleStatement != null)
+					        	MainFrame.oracleStatement.close();
+							if (MainFrame.oracleConnection != null)
+								MainFrame.oracleConnection.close();
+							if (MainFrame.mongoClient != null)
+								MainFrame.mongoClient.close();
+							
+							if(!username.equals("") && !password.equals(""))
+							{
+								MongoCredential credential = MongoCredential.createCredential(username, dbName, password.toCharArray()); 
+								ServerAddress serverAddress = new ServerAddress(host, Integer.parseInt(port)); 
+								MainFrame.mongoClient = new MongoClient(serverAddress, Arrays.asList(credential));
+							}
+							else
+							{
+								MainFrame.mongoClient = new MongoClient(host, Integer.parseInt(port));
+							}
+							DB db = MainFrame.mongoClient.getDB(dbName);
+							//boolean auth = db.authenticate(username, password.toCharArray());
+							DBCollection coll = db.getCollection(collectionName); 
+							
+		                    MainFrame.eventCollection = new EventCollection();
+	                        MainFrame.graphNet = new GraphNet();
+	                        MainFrame.variantCollection = new VariantCollection();
+	                        MainFrame.caseCollection = new CaseCollection();
+	                        MainFrame.activeCasesOverTimeChart = new ActiveCasesOverTimeChart();
+	                        MainFrame.eventsOverTimeChart = new EventsOverTimeChart();
+	                        MainFrame.eventsPerCaseChart = new EventsPerCaseChart();
+	                        MainFrame.caseDurationChart = new CaseDurationChart();
+	                        MainFrame.caseUtilizationChart = new CaseUtilizationChart();
+	                        MainFrame.meanActivityDurationChart = new MeanActivityDurationChart();
+	                        MainFrame.meanWaitingTimeChart = new MeanWaitingTimeChart();
+	                        MainFrame.activityCollection = new ActivityCollection();
+	                        MainFrame.resourceCollection = new ResourceCollection();
+	                        
+	                        MainFrame.mainFrame.getContentPane().removeAll();
+	    					System.gc();
+	    					ImportPanel importPanel = new ImportPanel(coll);
+	    					MainFrame.mainFrame.setContentPane(importPanel);
+	    					MainFrame.mainFrame.setVisible(true);
+	    					System.gc();
+	    					
+	    					MainFrame.dataSource = 1;
+	    					
+							jd.dispose();
+						} catch (Exception e1) {
+		                    e1.printStackTrace();
+		                }
+		                
+					}
+				});
+				
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSingleCancleButton = new JButton("Cancle");
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSingleCancleButton = new JButton("取消");
+				}
+				mongodbSingleCancleButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						jd.dispose();
+					}
+				});
+				
+				mongodbSingleHostLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSingleHostLabelPanel.add(new JLabel("Host: "));
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSingleHostLabelPanel.add(new JLabel("主机："));
+				}
+				mongodbSingleHostLabelPanel.add(mongodbSingleHostText);
+				
+				mongodbSinglePortLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSinglePortLabelPanel.add(new JLabel("Port: "));
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSinglePortLabelPanel.add(new JLabel("端口："));
+				}
+				mongodbSinglePortLabelPanel.add(mongodbSinglePortText);
+				
+				mongodbSingleDBLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSingleDBLabelPanel.add(new JLabel("Database: "));
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSingleDBLabelPanel.add(new JLabel("数据库："));
+				}
+				mongodbSingleDBLabelPanel.add(mongodbSingleDBText);
+				
+				mongodbSingleCollectionLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSingleCollectionLabelPanel.add(new JLabel("Collection: "));
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSingleCollectionLabelPanel.add(new JLabel("集合："));
+				}
+				mongodbSingleCollectionLabelPanel.add(mongodbSingleCollectionText);
+				
+				mongodbSingleUserLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSingleUserLabelPanel.add(new JLabel("User Name: "));
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSingleUserLabelPanel.add(new JLabel("用户名："));
+				}
+				mongodbSingleUserLabelPanel.add(mongodbSingleUserText);
+				
+				mongodbSinglePasswordLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbSinglePasswordLabelPanel.add(new JLabel("Password: "));
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbSinglePasswordLabelPanel.add(new JLabel("密码："));
+				}
+				mongodbSinglePasswordLabelPanel.add(mongodbSinglePasswordText);
+				
+				mongodbSingleButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 20));
+				mongodbSingleButtonPanel.add(mongodbSingleOkButton);
+				mongodbSingleButtonPanel.add(mongodbSingleCancleButton);
+				
+				mongodbSingleLabelPanel = new JPanel(new GridLayout(0, 1));
+				mongodbSingleLabelPanel.add(mongodbSingleHostLabelPanel);
+				mongodbSingleLabelPanel.add(mongodbSinglePortLabelPanel);
+				mongodbSingleLabelPanel.add(mongodbSingleDBLabelPanel);
+				mongodbSingleLabelPanel.add(mongodbSingleCollectionLabelPanel);
+				mongodbSingleLabelPanel.add(mongodbSingleUserLabelPanel);
+				mongodbSingleLabelPanel.add(mongodbSinglePasswordLabelPanel);
+				
+				mongodbSingleSelectPanel = new JPanel(new BorderLayout());
+				mongodbSingleSelectPanel.add(mongodbSingleLabelPanel, BorderLayout.CENTER);
+				mongodbSingleSelectPanel.add(mongodbSingleButtonPanel, BorderLayout.SOUTH);
+
+				mongodbTabbedPanel = new JTabbedPane();
+				if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+				{
+					mongodbTabbedPanel.addTab("Single table", null, mongodbSingleSelectPanel, "Single table");
+				}
+				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+				{
+					mongodbTabbedPanel.addTab("单表", null, mongodbSingleSelectPanel, "单表");
+				}
+				
+				mongodbTabbedPanel.addChangeListener(new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e) {
+						// TODO Auto-generated method stub
+						if(mongodbTabbedPanel.getSelectedIndex() == 0)
+						{
+			        		jd.setSize(new Dimension(510, 400));
+			                jd.setPreferredSize(new Dimension(510, 400));
+						}
+		                int x = (Toolkit.getDefaultToolkit().getScreenSize().width - jd.getSize().width)/2;
+		                int y = (Toolkit.getDefaultToolkit().getScreenSize().height - jd.getSize().height)/2;
+		                jd.setLocation(x, y);
+					}
+				});
+				
+				
+				tabbedPanel = new JTabbedPane();
+				tabbedPanel.addTab("Oracle", null, oracleTabbedPanel, "Oracle");
+				tabbedPanel.addTab("MongoDB", null, mongodbTabbedPanel, "MongoDB");
 				
 				tabbedPanel.addChangeListener(new ChangeListener(){
 					@Override
@@ -441,13 +714,24 @@ public class DatabaseButton extends JButton{
 						// TODO Auto-generated method stub
 						if(tabbedPanel.getSelectedIndex() == 0)
 						{
-			        		jd.setSize(new Dimension(510, 340));
-			                jd.setPreferredSize(new Dimension(510, 340));
+							if(oracleTabbedPanel.getSelectedIndex() == 0)
+							{
+				        		jd.setSize(new Dimension(510, 340));
+				                jd.setPreferredSize(new Dimension(510, 340));
+							}
+							else if(oracleTabbedPanel.getSelectedIndex() == 1)
+							{
+				        		jd.setSize(new Dimension(510, 504));
+				                jd.setPreferredSize(new Dimension(510, 504));
+							}
 						}
 						else if(tabbedPanel.getSelectedIndex() == 1)
 						{
-			        		jd.setSize(new Dimension(510, 476));
-			                jd.setPreferredSize(new Dimension(510, 476));
+							if(mongodbTabbedPanel.getSelectedIndex() == 0)
+							{
+				        		jd.setSize(new Dimension(510, 400));
+				                jd.setPreferredSize(new Dimension(510, 400));
+							}
 						}
 		                int x = (Toolkit.getDefaultToolkit().getScreenSize().width - jd.getSize().width)/2;
 		                int y = (Toolkit.getDefaultToolkit().getScreenSize().height - jd.getSize().height)/2;

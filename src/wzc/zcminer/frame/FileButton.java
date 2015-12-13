@@ -210,12 +210,14 @@ public class FileButton extends JButton{
                     File file = fd.getSelectedFile();
                     if (file!=null){
 						try {
-					        if (MainFrame.result != null)
-					        	MainFrame.result.close();
-					        if (MainFrame.statement != null)
-					        	MainFrame.statement.close();
-							if (MainFrame.connection != null)
-								MainFrame.connection.close();
+					        if (MainFrame.oracleResult != null)
+					        	MainFrame.oracleResult.close();
+					        if (MainFrame.oracleStatement != null)
+					        	MainFrame.oracleStatement.close();
+							if (MainFrame.oracleConnection != null)
+								MainFrame.oracleConnection.close();
+							if (MainFrame.mongoClient != null)
+								MainFrame.mongoClient.close();
 		                } catch (Exception e1) {
 		                    e1.printStackTrace();
 		                }

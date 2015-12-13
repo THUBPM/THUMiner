@@ -14,6 +14,8 @@ import java.util.Properties;
 
 import javax.swing.*;
 
+import com.mongodb.MongoClient;
+
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;
 import wzc.zcminer.global.CaseCollection;
@@ -46,9 +48,10 @@ public class MainFrame {
 	static ActivityCollection activityCollection;
 	static ResourceCollection resourceCollection;
 	static int dataSource = 0; //0:file 1:database
-	static Connection connection = null;
-	static PreparedStatement statement = null;
-	static ResultSet result = null;
+	static Connection oracleConnection = null;
+	static PreparedStatement oracleStatement = null;
+	static ResultSet oracleResult = null;
+	static MongoClient mongoClient = null;
 
 	static JFrame mainFrame;
 	static FileButton fileButton;

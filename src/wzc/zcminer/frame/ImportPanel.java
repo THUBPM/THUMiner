@@ -1,9 +1,13 @@
 package wzc.zcminer.frame;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.DataInputStream;
@@ -22,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -38,10 +43,13 @@ import wzc.zcminer.global.Case;
 import wzc.zcminer.global.Resource;
 import wzc.zcminer.global.Variant;
 
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.opencsv.CSVReader;
 
 //数据导入面板
-public class ImportPanel extends JPanel {
+public class ImportPanel extends JPanel{
 	static ColumnSelectableJTable table;
 	static JPanel radioPanel;
 	static JRadioButton removeButton;
@@ -131,158 +139,237 @@ public class ImportPanel extends JPanel {
 		try {
 			myEntries = new ArrayList<String[]>();
          	String count_sql = "select count(column_name) from user_tab_columns where table_name='" + db_table + "'";
-         	MainFrame.statement = MainFrame.connection.prepareStatement(count_sql);
-            MainFrame.result = MainFrame.statement.executeQuery();
+         	MainFrame.oracleStatement = MainFrame.oracleConnection.prepareStatement(count_sql);
+            MainFrame.oracleResult = MainFrame.oracleStatement.executeQuery();
             int column_count = 0;
-            while (MainFrame.result.next())
+            while (MainFrame.oracleResult.next())
             {
-            	column_count = MainFrame.result.getInt(1);
+            	column_count = MainFrame.oracleResult.getInt(1);
             }
-            if (MainFrame.result != null)
-            	MainFrame.result.close();
-            if (MainFrame.statement != null)
-            	MainFrame.statement.close();
+	        if (MainFrame.oracleResult != null)
+	        	MainFrame.oracleResult.close();
+	        if (MainFrame.oracleStatement != null)
+	        	MainFrame.oracleStatement.close();
 		    
          	String header_sql = "select column_name from user_tab_columns where table_name='" + db_table + "'";
-         	MainFrame.statement = MainFrame.connection.prepareStatement(header_sql);
-            MainFrame.result = MainFrame.statement.executeQuery();
+         	MainFrame.oracleStatement = MainFrame.oracleConnection.prepareStatement(header_sql);
+            MainFrame.oracleResult = MainFrame.oracleStatement.executeQuery();
             String[] temp = new String[column_count];
             int count = 0;
-            while (MainFrame.result.next())
+            while (MainFrame.oracleResult.next())
             {
-                temp[count] = MainFrame.result.getString(1);
+                temp[count] = MainFrame.oracleResult.getString(1);
                 count++;
             }
             myEntries.add(temp);
-		    if (MainFrame.result != null)
-		      	MainFrame.result.close();
-		    if (MainFrame.statement != null)
-		       	MainFrame.statement.close();
+	        if (MainFrame.oracleResult != null)
+	        	MainFrame.oracleResult.close();
+	        if (MainFrame.oracleStatement != null)
+	        	MainFrame.oracleStatement.close();
 		        
          	String data_sql = "select * from " + db_table;
-         	MainFrame.statement = MainFrame.connection.prepareStatement(data_sql);
-            MainFrame.result = MainFrame.statement.executeQuery();
-            while (MainFrame.result.next())
+         	MainFrame.oracleStatement = MainFrame.oracleConnection.prepareStatement(data_sql);
+            MainFrame.oracleResult = MainFrame.oracleStatement.executeQuery();
+            while (MainFrame.oracleResult.next())
             {
                 temp = new String[column_count];
                 for(int i = 0; i < column_count; i++)
-                	temp[i] = MainFrame.result.getString(myEntries.get(0)[i]);
+                	temp[i] = MainFrame.oracleResult.getString(myEntries.get(0)[i]);
                 myEntries.add(temp);
             }
-		    if (MainFrame.result != null)
-		       	MainFrame.result.close();
-		    if (MainFrame.statement != null)
-		       	MainFrame.statement.close();
-		    if (MainFrame.connection != null)
-		       	MainFrame.connection.close();
+	        if (MainFrame.oracleResult != null)
+	        	MainFrame.oracleResult.close();
+	        if (MainFrame.oracleStatement != null)
+	        	MainFrame.oracleStatement.close();
+			if (MainFrame.oracleConnection != null)
+				MainFrame.oracleConnection.close();
             
 			headlines = myEntries.remove(0);
-			setPanel("database_timestamp");
+			setPanel("oracle_database_timestamp");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 	
 	
-	public ImportPanel(String[] tableList, String[] tableEventidList) {
+	public ImportPanel(String[][] tableRelation) {
 		// TODO Auto-generated constructor stub
-		try {			
+		try {
+			String[] tableList = new String[tableRelation.length + 1];
+			for(int i = 0; i < tableList.length; i++)
+			{
+				tableList[i] = "";
+			}
+			int tableCount = 0;
+			for(int i = 0; i < tableRelation.length; i++)
+			{
+				String table1 = tableRelation[i][0].toUpperCase();
+				if(table1 == null) table1 = "";
+				if(!table1.equals(""))
+				{
+					boolean flag = false;
+					for(int j = 0; j < tableCount; j++)
+					{
+						if(tableList[j].equals(table1))
+						{
+							flag = true;
+						}
+					}
+					if(!flag)
+					{
+						tableList[tableCount] = table1;
+						tableCount++;
+					}
+				}
+				String table2 = tableRelation[i][2].toUpperCase();
+				if(table2 == null) table2 = "";
+				if(!table2.equals(""))
+				{
+					boolean flag = false;
+					for(int j = 0; j < tableCount; j++)
+					{
+						if(tableList[j].equals(table2))
+						{
+							flag = true;
+						}
+					}
+					if(!flag)
+					{
+						tableList[tableCount] = table2;
+						tableCount++;
+					}
+				}
+			}
+			
 			myEntries = new ArrayList<String[]>();
-			int column_count = 0;
+			int columnCount = 0;
 			for(int i = 0; i < tableList.length; i++)
 			{
 				String table = tableList[i].toUpperCase();
-				String tableEventid = tableEventidList[i].toUpperCase();
 				if(table == null) table = "";
-				if(tableEventid == null) table = "";
-				if(!table.equals("") && !tableEventid.equals(""))
+				if(!table.equals(""))
 				{
 		         	String count_sql = "select count(column_name) from user_tab_columns where table_name='" + table + "'";
-		         	MainFrame.statement = MainFrame.connection.prepareStatement(count_sql);
-		            MainFrame.result = MainFrame.statement.executeQuery();
-		            while (MainFrame.result.next())
+		         	MainFrame.oracleStatement = MainFrame.oracleConnection.prepareStatement(count_sql);
+		            MainFrame.oracleResult = MainFrame.oracleStatement.executeQuery();
+		            while (MainFrame.oracleResult.next())
 		            {
-		            	column_count += (MainFrame.result.getInt(1) - 1);
+		            	columnCount += (MainFrame.oracleResult.getInt(1));
 		            }
-		            if (MainFrame.result != null)
-		            	MainFrame.result.close();
-		            if (MainFrame.statement != null)
-		            	MainFrame.statement.close();
+			        if (MainFrame.oracleResult != null)
+			        	MainFrame.oracleResult.close();
+			        if (MainFrame.oracleStatement != null)
+			        	MainFrame.oracleStatement.close();
 	            }
 		    }
 
-            String[] temp = new String[column_count];
-            String[][] tableHeader = new String[tableList.length][column_count];
+            String[] temp = new String[columnCount];
+            String[][] tableHeader = new String[tableList.length][columnCount];
             int count = 0;
 			for(int i = 0; i < tableList.length; i++)
 			{
 				String table = tableList[i].toUpperCase();
-				String tableEventid = tableEventidList[i].toUpperCase();
 				if(table == null) table = "";
-				if(tableEventid == null) table = "";
-				if(!table.equals("") && !tableEventid.equals(""))
+				if(!table.equals(""))
 				{
 		         	String header_sql = "select column_name from user_tab_columns where table_name='" + table + "'";
-		         	MainFrame.statement = MainFrame.connection.prepareStatement(header_sql);
-		            MainFrame.result = MainFrame.statement.executeQuery();
+		         	MainFrame.oracleStatement = MainFrame.oracleConnection.prepareStatement(header_sql);
+		            MainFrame.oracleResult = MainFrame.oracleStatement.executeQuery();
 		            int tableColumnCount = 0;
-		            while (MainFrame.result.next())
+		            while (MainFrame.oracleResult.next())
 		            {
-		                String columnName = MainFrame.result.getString(1);
-		                if(!columnName.equals(tableEventid))
-		                {
-		                	temp[count] = columnName;
-		                	tableHeader[i][tableColumnCount] = columnName;
-		                	tableColumnCount++;
-		                	count++;
-		                }
+		                String columnName = MainFrame.oracleResult.getString(1);
+	                	temp[count] = columnName;
+	                	tableHeader[i][tableColumnCount] = columnName;
+	                	tableColumnCount++;
+	                	count++;
 		            }
-				    if (MainFrame.result != null)
-				      	MainFrame.result.close();
-				    if (MainFrame.statement != null)
-				       	MainFrame.statement.close();
+			        if (MainFrame.oracleResult != null)
+			        	MainFrame.oracleResult.close();
+			        if (MainFrame.oracleStatement != null)
+			        	MainFrame.oracleStatement.close();
 		       	}
 		    }
 		    myEntries.add(temp);
 		    
 		    String data_sql_table = "";
 		    String data_sql_condition = "";
-		    String a0_eventid = "";
 		    for(int i = 0; i < tableList.length; i++)
 			{
 				String table = tableList[i].toUpperCase();
-				String tableEventid = tableEventidList[i].toUpperCase();
 				if(table == null) table = "";
-				if(tableEventid == null) table = "";
-				if(!table.equals("") && !tableEventid.equals(""))
+				if(!table.equals(""))
 				{
-					if(a0_eventid.equals(""))
-						a0_eventid = tableEventid;
-		         	data_sql_table += (table + " a" + i + ",");
-		         	data_sql_condition += ("a0." + a0_eventid + "=a" + i + "." + tableEventid + " and ");
+		         	data_sql_table += (table + ",");
+				}
+		    }
+		    for(int i = 0; i < tableRelation.length; i++)
+			{
+				String table1 = tableRelation[i][0].toUpperCase();
+				String tableEventid1 = tableRelation[i][1].toUpperCase();
+				String table2 = tableRelation[i][2].toUpperCase();
+				String tableEventid2 = tableRelation[i][3].toUpperCase();
+				if(table1 == null) table1 = "";
+				if(tableEventid1 == null) tableEventid1 = "";
+				if(table2 == null) table2 = "";
+				if(tableEventid2 == null) tableEventid2 = "";
+				if(!table1.equals("") && !tableEventid1.equals("") && !table2.equals("") && !tableEventid2.equals(""))
+				{
+		         	data_sql_condition += (table1 + "." + tableEventid1 + "=" + table2 + "." + tableEventid2 + " and ");
 				}
 		    }
 		    data_sql_table = data_sql_table.substring(0, data_sql_table.length() - 1);
 		    data_sql_condition = data_sql_condition.substring(0, data_sql_condition.length() - 5);
          	String data_sql = "select * from " + data_sql_table + " where " + data_sql_condition;
-         	MainFrame.statement = MainFrame.connection.prepareStatement(data_sql);
-            MainFrame.result = MainFrame.statement.executeQuery();
-            while (MainFrame.result.next())
+         	MainFrame.oracleStatement = MainFrame.oracleConnection.prepareStatement(data_sql);
+            MainFrame.oracleResult = MainFrame.oracleStatement.executeQuery();
+            while (MainFrame.oracleResult.next())
             {
-                temp = new String[column_count];
-                for(int j = 0; j < column_count; j++)
-                	temp[j] = MainFrame.result.getString(myEntries.get(0)[j]);
+                temp = new String[columnCount];
+                for(int j = 0; j < columnCount; j++)
+                	temp[j] = MainFrame.oracleResult.getString(myEntries.get(0)[j]);
                 myEntries.add(temp);
             }
-		    if (MainFrame.result != null)
-		       	MainFrame.result.close();
-		    if (MainFrame.statement != null)
-		       	MainFrame.statement.close();
-		    if (MainFrame.connection != null)
-		       	MainFrame.connection.close();
+	        if (MainFrame.oracleResult != null)
+	        	MainFrame.oracleResult.close();
+	        if (MainFrame.oracleStatement != null)
+	        	MainFrame.oracleStatement.close();
+			if (MainFrame.oracleConnection != null)
+				MainFrame.oracleConnection.close();
             
 			headlines = myEntries.remove(0);
-			setPanel("database_timestamp");
+			setPanel("oracle_database_timestamp");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public ImportPanel(DBCollection coll) {
+		// TODO Auto-generated constructor stub
+		try {
+			myEntries = new ArrayList<String[]>();
+			
+			DBObject header_document = coll.findOne();
+			int column_count = header_document.keySet().size();
+			String[] temp = new String[column_count];
+            for(int i = 0; i < column_count; i++)
+            	temp[i] = header_document.keySet().toArray()[i].toString();
+            myEntries.add(temp);
+            
+			DBCursor cursor = coll.find();
+			while (cursor.hasNext())
+			{
+				DBObject document = cursor.next();
+                temp = new String[column_count];
+                for(int i = 0; i < column_count; i++)
+                	temp[i] = (String) document.get(myEntries.get(0)[i]).toString();
+                myEntries.add(temp);
+			}
+            
+			if (MainFrame.mongoClient != null)
+				MainFrame.mongoClient.close();
+			headlines = myEntries.remove(0);
+			setPanel("mongo_database_timestamp");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -507,9 +594,31 @@ public class ImportPanel extends JPanel {
 		});
 
 		add(okButton, BorderLayout.PAGE_END);
+		
+        addComponentListener(new ComponentAdapter() {
+        	public void componentMoved(ComponentEvent e) {}
+        	
+        	public void componentResized(ComponentEvent e) {
+        		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        		if(table.getColumnCount() * 75 < dataPanel.getWidth() - 18)
+        		{
+        			table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        		}
+        	}
+        	
+        	public void componentShown(ComponentEvent e) {
+        		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        		if(table.getColumnCount() * 75 < dataPanel.getWidth() - 18)
+        		{
+        			table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        		}
+        	}
+        	
+        	public void componentHidden(ComponentEvent e) {}
+        });
 	}
-	
-	
+
+
 	//更新event集
     public void setEventCollection() {
 
@@ -964,6 +1073,5 @@ public class ImportPanel extends JPanel {
         }
         MainFrame.resourceCollection.sortAndMerge();
     }
-    
-    
+
 }
