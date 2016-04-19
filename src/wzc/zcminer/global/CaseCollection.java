@@ -94,15 +94,15 @@ public class CaseCollection {
     
 	List<Case> cases;
 	long totalDuration;
-//	Date start;
-//	Date end;
+	Date start;
+	Date end;
 
 	public CaseCollection() {
 		// TODO Auto-generated constructor stub
 	    cases = new ArrayList<Case>();
 	    totalDuration = 0;
-//	    start = null;
-//	    end = null;
+	    start = null;
+	    end = null;
 	}
 
 	public void addCase(Case c) {
@@ -115,14 +115,14 @@ public class CaseCollection {
 	    {
 	        Case c = getCase(i);
 	        totalDuration += c.getDuration();
-//	        if(start == null)
-//	            start = c.getStart();
-//	        else if(start.after(c.getStart()))
-//	            start = c.getStart();
-//	        if(end == null)
-//	            end = c.getEnd();
-//	        else if(end.before(c.getEnd()))
-//	            end = c.getEnd();
+	        if(start == null)
+	            start = c.getStart();
+	        else if(start.after(c.getStart()))
+	            start = c.getStart();
+	        if(end == null)
+	            end = c.getEnd();
+	        else if(end.before(c.getEnd()))
+	            end = c.getEnd();
 	    }
 	}
 	
@@ -131,24 +131,10 @@ public class CaseCollection {
 	}
 	
 	public Date getStart(){
-	    Date start = getCase(0).getStart();
-	    for(int i = 1; i < getSize(); i++)
-        {
-            Case c = getCase(i);
-            if(start.after(c.getStart()))
-                start = c.getStart();
-        }
 	    return start;
 	}
 	
 	public Date getEnd(){
-        Date end = getCase(0).getEnd();
-        for(int i = 1; i < getSize(); i++)
-        {
-            Case c = getCase(i);
-            if(end.before(c.getEnd()))
-                end = c.getEnd();
-        }
         return end;
 	}
 	
@@ -158,10 +144,6 @@ public class CaseCollection {
 	
 	public Case getCase(int pos) {
 		return cases.get(pos);
-	}
-	
-	public void setCase(int pos, Case c) {
-	    cases.set(pos, c);
 	}
 	
 	public void sortByDuration(){

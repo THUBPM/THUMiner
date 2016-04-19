@@ -30,6 +30,7 @@ import com.mongodb.WriteConcern;
 
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;
+import wzc.zcminer.global.BigCaseCollection;
 import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.CaseDurationChart;
 import wzc.zcminer.global.CaseUtilizationChart;
@@ -51,7 +52,19 @@ import java.sql.SQLException;
 
 //选择数据库按钮
 public class DatabaseButton extends JButton{
-	
+    private static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+    
 	static JTabbedPane tabbedPanel;
 	
 	static JTabbedPane oracleTabbedPanel;
@@ -166,6 +179,9 @@ public class DatabaseButton extends JButton{
 		                    Class.forName(driver);
 		                    MainFrame.oracleConnection = DriverManager.getConnection(url, username, password);
 		                    
+		                    MainFrame.bigEventCollection = null;
+							MainFrame.bigAnimation = null;
+							MainFrame.bigCaseCollection = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();
@@ -315,18 +331,26 @@ public class DatabaseButton extends JButton{
 						}
 
 						try {
-					        if (MainFrame.oracleResult != null)
-					        	MainFrame.oracleResult.close();
-					        if (MainFrame.oracleStatement != null)
-					        	MainFrame.oracleStatement.close();
-							if (MainFrame.oracleConnection != null)
-								MainFrame.oracleConnection.close();
-							if (MainFrame.mongoClient != null)
-								MainFrame.mongoClient.close();
+							try {
+						        if (MainFrame.oracleResult != null)
+						        	MainFrame.oracleResult.close();
+						        if (MainFrame.oracleStatement != null)
+						        	MainFrame.oracleStatement.close();
+								if (MainFrame.oracleConnection != null)
+									MainFrame.oracleConnection.close();
+								if (MainFrame.mongoClient != null)
+									MainFrame.mongoClient.close();
+			                } catch (Exception e1) {
+			                    e1.printStackTrace();
+			                }
+							deleteDir(new File("data_tmp"));
 
 		                    Class.forName(driver);
 		                    MainFrame.oracleConnection = DriverManager.getConnection(url, username, password);
 		                    
+		                    MainFrame.bigEventCollection = null;
+							MainFrame.bigAnimation = null;
+							MainFrame.bigCaseCollection = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();
@@ -519,7 +543,6 @@ public class DatabaseButton extends JButton{
 				}
 				mongodbSingleOkButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-		                String driver = "mongodb.jdbc.driver.OracleDriver";
 		                String host = mongodbSingleHostText.getText();
 		                String port = mongodbSinglePortText.getText();
 		                String dbName = mongodbSingleDBText.getText();
@@ -551,6 +574,9 @@ public class DatabaseButton extends JButton{
 							//boolean auth = db.authenticate(username, password.toCharArray());
 							DBCollection coll = db.getCollection(collectionName); 
 							
+							MainFrame.bigEventCollection = null;
+							MainFrame.bigAnimation = null;
+							MainFrame.bigCaseCollection = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();

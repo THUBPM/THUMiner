@@ -61,6 +61,7 @@ public class ImportPanel extends JPanel{
 	static ButtonGroup buttonGroup;
 	static FileButton fileButton;
 	static DatabaseButton databaseButton;
+	static BigFileButton bigFileButton;
 	static JTextField timeText; //时间模式输入
 	static JButton okButton;
 	final static int MAXHEADINDEX = 20;
@@ -362,7 +363,7 @@ public class ImportPanel extends JPanel{
 				DBObject document = cursor.next();
                 temp = new String[column_count];
                 for(int i = 0; i < column_count; i++)
-                	temp[i] = (String) document.get(myEntries.get(0)[i]).toString();
+                	temp[i] = document.get(myEntries.get(0)[i]).toString();
                 myEntries.add(temp);
 			}
             
@@ -476,9 +477,11 @@ public class ImportPanel extends JPanel{
 
 		fileButton = new FileButton();
 		databaseButton = new DatabaseButton();
+		bigFileButton = new BigFileButton();
 
         radioPanel.add(fileButton);
         radioPanel.add(databaseButton);
+		radioPanel.add(bigFileButton);
 		radioPanel.add(removeButton);
 		radioPanel.add(otherButton);
 		radioPanel.add(caseButton);

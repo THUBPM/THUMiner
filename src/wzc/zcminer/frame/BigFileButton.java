@@ -17,7 +17,9 @@ import javax.swing.filechooser.FileFilter;
 
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;
+import wzc.zcminer.global.BigAnimation;
 import wzc.zcminer.global.BigCaseCollection;
+import wzc.zcminer.global.BigEventCollection;
 import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.CaseDurationChart;
 import wzc.zcminer.global.CaseUtilizationChart;
@@ -31,7 +33,22 @@ import wzc.zcminer.global.ResourceCollection;
 import wzc.zcminer.global.VariantCollection;
 
 //选择文件按钮
-public class FileButton extends JButton{
+public class BigFileButton extends JButton{
+    public static boolean createDir(String destDirName) {
+    	File dir = new File(destDirName);
+    	if (dir.exists()) {
+    		return false;
+    	}
+    	if (!destDirName.endsWith(File.separator)) {
+    		destDirName = destDirName + File.separator;
+    	}
+    	if (dir.mkdirs()) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+    
     private static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
@@ -49,16 +66,16 @@ public class FileButton extends JButton{
 	static JCheckBox tableHead;
 	static JComboBox<String> encoding;
 
-	public FileButton() {
+	public BigFileButton() {
 		super();
 		
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-			setText("Select file");
+			setText("Select big file");
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-			setText("选择文件");
+			setText("选择大文件");
 		}
 		//导入数据文件
 		addActionListener(new ActionListener() {
@@ -97,23 +114,15 @@ public class FileButton extends JButton{
 				{
 					fileENames[0][0] = ".csv";
 					fileENames[0][1] = "Csv files(*.csv)";
-					fileENames[1][0] = ".xls";
-					fileENames[1][1] = "Xls files(*.xls)";
-					fileENames[2][0] = ".xlsx";
-					fileENames[2][1] = "Xlsx files(*.xlsx)";
-					fileENames[3][0] = ".txt";
-					fileENames[3][1] = "Txt files(*.txt)";
+					fileENames[1][0] = ".txt";
+					fileENames[1][1] = "Txt files(*.txt)";
 				}
 				else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 				{
 					fileENames[0][0] = ".csv";
 					fileENames[0][1] = "Csv文件(*.csv)";
-					fileENames[1][0] = ".xls";
-					fileENames[1][1] = "Xls文件(*.xls)";
-					fileENames[2][0] = ".xlsx";
-					fileENames[2][1] = "Xlsx文件(*.xlsx)";
-					fileENames[3][0] = ".txt";
-					fileENames[3][1] = "Txt文件(*.txt)";
+					fileENames[1][0] = ".txt";
+					fileENames[1][1] = "Txt文件(*.txt)";
 				}
 				fd.addChoosableFileFilter(new FileFilter() {
 					public boolean accept(File file) {
@@ -237,31 +246,36 @@ public class FileButton extends JButton{
 		                }
 						deleteDir(new File("data_tmp"));
 						
-						MainFrame.bigEventCollection = null;
-						MainFrame.bigAnimation = null;
-						MainFrame.bigCaseCollection = null;
-                        MainFrame.eventCollection = new EventCollection();
+                        MainFrame.eventCollection = null;
                         MainFrame.graphNet = new GraphNet();
-                        MainFrame.variantCollection = new VariantCollection();
-                        MainFrame.caseCollection = new CaseCollection();
-                        MainFrame.activeCasesOverTimeChart = new ActiveCasesOverTimeChart();
-                        MainFrame.eventsOverTimeChart = new EventsOverTimeChart();
-                        MainFrame.eventsPerCaseChart = new EventsPerCaseChart();
-                        MainFrame.caseDurationChart = new CaseDurationChart();
-                        MainFrame.caseUtilizationChart = new CaseUtilizationChart();
-                        MainFrame.meanActivityDurationChart = new MeanActivityDurationChart();
-                        MainFrame.meanWaitingTimeChart = new MeanWaitingTimeChart();
+                        MainFrame.variantCollection = null;
+                        MainFrame.caseCollection = null;
+                        MainFrame.activeCasesOverTimeChart = null;
+                        MainFrame.eventsOverTimeChart = null;
+                        MainFrame.eventsPerCaseChart = null;
+                        MainFrame.caseDurationChart = null;
+                        MainFrame.caseUtilizationChart = null;
+                        MainFrame.meanActivityDurationChart = null;
+                        MainFrame.meanWaitingTimeChart = null;
                         MainFrame.activityCollection = new ActivityCollection();
                         MainFrame.resourceCollection = new ResourceCollection();
-                        
+                        MainFrame.bigEventCollection = new BigEventCollection();
+                        MainFrame.bigCaseCollection = new BigCaseCollection();
+						MainFrame.bigAnimation = new BigAnimation();
+						
                         MainFrame.mainFrame.getContentPane().removeAll();
+                        createDir("data_tmp");
+                        createDir("data_tmp\\event");
+                        createDir("data_tmp\\animation");
+                        createDir("data_tmp\\case");
+                        createDir("data_tmp\\variant");
     					System.gc();
-    					ImportPanel importPanel = new ImportPanel(file.getAbsolutePath(), separatorText.getText().charAt(0), tableHead.isSelected(), encoding.getItemAt(encoding.getSelectedIndex()));
+    					BigImportPanel importPanel = new BigImportPanel(file.getAbsolutePath(), separatorText.getText(), tableHead.isSelected(), encoding.getItemAt(encoding.getSelectedIndex()));
     					MainFrame.mainFrame.setContentPane(importPanel);
     					MainFrame.mainFrame.setVisible(true);
     					System.gc();
     					
-    					MainFrame.dataSource = 0;
+    					MainFrame.dataSource = 2;
                     }
                 }
 			}

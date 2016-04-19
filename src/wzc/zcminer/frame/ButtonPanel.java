@@ -9,6 +9,7 @@ import javax.swing.*;
 public class ButtonPanel extends JPanel{
 	static FileButton fileButton;
 	static DatabaseButton databaseButton;
+	static BigFileButton bigFileButton;
 	static JButton mapButton;
 	static JButton staticsButton;
 	static JButton casesButton;
@@ -18,6 +19,7 @@ public class ButtonPanel extends JPanel{
 		
 		fileButton = new FileButton();
 		databaseButton = new DatabaseButton();
+		bigFileButton = new BigFileButton();
 
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
@@ -31,8 +33,13 @@ public class ButtonPanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 MainFrame.mainFrame.getContentPane().removeAll();
                 System.gc();
-                MapPanel mapPanel = new MapPanel();
-                MainFrame.mainFrame.setContentPane(mapPanel);
+                if(MainFrame.dataSource == 0 || MainFrame.dataSource == 1){
+                	MapPanel mapPanel = new MapPanel();
+                	MainFrame.mainFrame.setContentPane(mapPanel);
+                }else if(MainFrame.dataSource == 2){
+                	BigMapPanel mapPanel = new BigMapPanel();
+                	MainFrame.mainFrame.setContentPane(mapPanel);
+                }
                 MainFrame.mainFrame.setVisible(true);
                 System.gc();
             }
@@ -50,8 +57,13 @@ public class ButtonPanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 MainFrame.mainFrame.getContentPane().removeAll();
                 System.gc();
-                StaticsPanel staticsPanel = new StaticsPanel();
-                MainFrame.mainFrame.setContentPane(staticsPanel);
+                if(MainFrame.dataSource == 0 || MainFrame.dataSource == 1){
+                    StaticsPanel staticsPanel = new StaticsPanel();
+                    MainFrame.mainFrame.setContentPane(staticsPanel);
+                }else if(MainFrame.dataSource == 2){
+                    BigStaticsPanel staticsPanel = new BigStaticsPanel();
+                    MainFrame.mainFrame.setContentPane(staticsPanel);
+                }
                 MainFrame.mainFrame.setVisible(true);
                 System.gc();
             }
@@ -69,8 +81,13 @@ public class ButtonPanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 MainFrame.mainFrame.getContentPane().removeAll();
                 System.gc();
-                CasesPanel casesPanel = new CasesPanel();
-                MainFrame.mainFrame.setContentPane(casesPanel);
+                if(MainFrame.dataSource == 0 || MainFrame.dataSource == 1){
+                    CasesPanel casesPanel = new CasesPanel();
+                    MainFrame.mainFrame.setContentPane(casesPanel);
+                }else if(MainFrame.dataSource == 2){
+                    BigCasesPanel casesPanel = new BigCasesPanel();
+                    MainFrame.mainFrame.setContentPane(casesPanel);
+                }
                 MainFrame.mainFrame.setVisible(true);
                 System.gc();
             }
@@ -78,6 +95,7 @@ public class ButtonPanel extends JPanel{
 
 		add(fileButton);
 		add(databaseButton);
+		add(bigFileButton);
         add(mapButton);
         add(staticsButton);
         add(casesButton);

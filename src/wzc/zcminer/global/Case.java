@@ -21,6 +21,7 @@ public class Case {
 		caseID = "";
 		events = 0;
 		start = null;
+		end = null;
 		duration = 0;
 		active = 0;
 		activities = new ArrayList<String>();

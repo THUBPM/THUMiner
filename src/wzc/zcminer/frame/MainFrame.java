@@ -18,6 +18,9 @@ import com.mongodb.MongoClient;
 
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;
+import wzc.zcminer.global.BigAnimation;
+import wzc.zcminer.global.BigCaseCollection;
+import wzc.zcminer.global.BigEventCollection;
 import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.CaseDurationChart;
 import wzc.zcminer.global.CaseUtilizationChart;
@@ -47,7 +50,20 @@ public class MainFrame {
 	static MeanWaitingTimeChart meanWaitingTimeChart;
 	static ActivityCollection activityCollection;
 	static ResourceCollection resourceCollection;
-	static int dataSource = 0; //0:file 1:database
+	static BigEventCollection bigEventCollection;
+	static BigAnimation bigAnimation;
+	static BigCaseCollection bigCaseCollection;
+	//static VariantCollection variantCollection;
+	//static ActiveCasesOverTimeChart activeCasesOverTimeChart;
+	//static EventsOverTimeChart eventsOverTimeChart;
+	//static EventsPerCaseChart eventsPerCaseChart;
+	//static CaseDurationChart caseDurationChart;
+	//static CaseUtilizationChart caseUtilizationChart;
+	//static MeanActivityDurationChart meanActivityDurationChart;
+	//static MeanWaitingTimeChart meanWaitingTimeChart;
+	//static ActivityCollection activityCollection;
+	//static ResourceCollection resourceCollection;
+	static int dataSource = 0; //0:file 1:database 2:big file
 	static Connection oracleConnection = null;
 	static PreparedStatement oracleStatement = null;
 	static ResultSet oracleResult = null;
@@ -56,6 +72,7 @@ public class MainFrame {
 	static JFrame mainFrame;
 	static FileButton fileButton;
 	static DatabaseButton databaseButton;
+	static BigFileButton bigFileButton;
 	
 	static Properties properties;
 	static String filename;
@@ -75,6 +92,7 @@ public class MainFrame {
 
 		fileButton = new FileButton();
 		databaseButton = new DatabaseButton();
+		bigFileButton = new BigFileButton();
 
 		startPanel.setLayout(new BorderLayout());
 
@@ -90,6 +108,7 @@ public class MainFrame {
 		}
 		radioPanel.add(fileButton);
 		radioPanel.add(databaseButton);
+		radioPanel.add(bigFileButton);
 		startPanel.add(radioPanel, BorderLayout.CENTER);
 		
 		mainFrame.setVisible(true);

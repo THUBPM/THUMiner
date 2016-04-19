@@ -96,8 +96,8 @@ public class GraphNet {
 		maxActivityQueTime = new long[activityCount][activityCount];
 		minActivityTime = new long[activityCount];
 		minActivityQueTime = new long[activityCount][activityCount];
-
 	}
+	
 	public void setTime(int id, long time) {
 		if (maxActivityTime[id] < time){
 			 maxActivityTime[id] = time;
