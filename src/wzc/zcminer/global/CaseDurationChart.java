@@ -67,6 +67,15 @@ public class CaseDurationChart {
         data.get(i).addCaseCount();
     }
     
+    public void addCases(BigCase mycase) {
+        int i = ((int) Math.ceil(mycase.getDuration() * 1.0 / duration)) - 1;
+        if(i < 0)
+            i = 0;
+        if(i > 99)
+            i = 99;
+        data.get(i).addCaseCount();
+    }
+    
     public int getSize(){
         return data.size();
     }

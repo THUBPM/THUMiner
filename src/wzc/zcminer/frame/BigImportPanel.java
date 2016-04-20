@@ -359,13 +359,13 @@ public class BigImportPanel extends JPanel{
 			    setAnimation();
 			    setCaseCollection();
 			    //setVariantCollection();
-			    //setEventsOverTimeChart();
-			    //setActiveCasesOverTimeChart();
-			    //setEventsPerCaseChart();
-			    //setCaseDurationChart();
-			    //setCaseUtilizationChart();
-			    //setMeanActivityDurationChart();
-			    //setMeanWaitingTimeChart();
+			    setEventsOverTimeChart();
+			    setActiveCasesOverTimeChart();
+			    setEventsPerCaseChart();
+			    setCaseDurationChart();
+			    setCaseUtilizationChart();
+			    setMeanActivityDurationChart();
+			    setMeanWaitingTimeChart();
 			    setActivityCollection();
 			    setResourceCollection();
 				
@@ -766,33 +766,54 @@ public class BigImportPanel extends JPanel{
     
     //更新ActiveCasesOverTimeChart图表
     public void setActiveCasesOverTimeChart() {
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        long start = 0;
+        long end = 0;
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
+            if(start > mycase.getStart().getTime() || start == 0)
+            	start = mycase.getStart().getTime();
+            if(end < mycase.getEnd().getTime())
+            	end = mycase.getEnd().getTime();
+        	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
+        }
+        MainFrame.activeCasesOverTimeChart.init(start, end);
+        mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             MainFrame.activeCasesOverTimeChart.addActiveCasesOverTime(1, mycase.getStart());
             MainFrame.activeCasesOverTimeChart.addActiveCasesOverTime(-1, mycase.getEnd());
+        	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
-        MainFrame.activeCasesOverTimeChart.sort();
-        MainFrame.activeCasesOverTimeChart.merge();
     }
   
     
     //更新EventsOverTimeChart图表
     public void setEventsOverTimeChart() {
-        for (int i = 0; i < MainFrame.eventCollection.getSize(); i++) {
-            Event event = MainFrame.eventCollection.getEvent(i);
+        long start = 0;
+        long end = 0;
+        BigEvent event = MainFrame.bigEventCollection.getFirstEventID();
+        while(event != null){
+            if(start > event.getStartDate().getTime() || start == 0)
+            	start = event.getStartDate().getTime();
+            if(end < event.getEndDate().getTime())
+            	end = event.getEndDate().getTime();
+        	event = MainFrame.bigEventCollection.getNextEventID(event);
+        }
+        MainFrame.eventsOverTimeChart.init(start, end);
+        event = MainFrame.bigEventCollection.getFirstEventID();
+        while(event != null){
             MainFrame.eventsOverTimeChart.addEventsOverTime(1, event.getStartDate());
             MainFrame.eventsOverTimeChart.addEventsOverTime(-1, event.getEndDate());
+        	event = MainFrame.bigEventCollection.getNextEventID(event);
         }
-        MainFrame.eventsOverTimeChart.sort();
-        MainFrame.eventsOverTimeChart.merge();
     }
    
     
     //更新EventsPerCaseChart图表
     public void setEventsPerCaseChart() {
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             MainFrame.eventsPerCaseChart.addCases(mycase);
+        	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
     }
   
@@ -800,24 +821,27 @@ public class BigImportPanel extends JPanel{
     //更新CaseDurationChart图表
     public void setCaseDurationChart() {
         long max = 0;
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             if(max < mycase.getDuration())
                 max = mycase.getDuration();
+        	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
         MainFrame.caseDurationChart.setDuration(max / 100);
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             MainFrame.caseDurationChart.addCases(mycase);
+        	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
     }
   
     
     //更新CaseUtilizationChart图表
     public void setCaseUtilizationChart() {
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             MainFrame.caseUtilizationChart.addCases(mycase);
+           	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
     }
   
@@ -825,15 +849,17 @@ public class BigImportPanel extends JPanel{
     //更新MeanActivityDurationChart图表
     public void setMeanActivityDurationChart() {
         double max = 0;
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             if(max < mycase.getMeanActiveTime())
                 max = mycase.getMeanActiveTime();
+           	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
         MainFrame.meanActivityDurationChart.setDuration(max / 100);
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             MainFrame.meanActivityDurationChart.addCases(mycase);
+           	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
     }
  
@@ -841,15 +867,17 @@ public class BigImportPanel extends JPanel{
     //更新MeanWaitingTimeChart图表
     public void setMeanWaitingTimeChart() {
         double max = 0;
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             if(max < mycase.getMeanWaitingTime())
                 max = mycase.getMeanWaitingTime();
+           	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
         MainFrame.meanWaitingTimeChart.setDuration(max / 100);
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
             MainFrame.meanWaitingTimeChart.addCases(mycase);
+           	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
         }
     }
   

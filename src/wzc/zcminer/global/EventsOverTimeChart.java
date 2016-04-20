@@ -43,29 +43,30 @@ public class EventsOverTimeChart {
         }
     }
     
-    private class ComparatorDate implements Comparator<EventsOverTime>{
-        public int compare(EventsOverTime date1, EventsOverTime date2) {
-            if(date1.getDate().after(date2.getDate())) {return 1;}
-            else if (date1.getDate().before(date2.getDate())){return -1;}
-            else {return 0;}
-        }
-    }
-    
     List<EventsOverTime> data;
     int size;
+    long start;
+    long end;
+    long duration;
 
     public EventsOverTimeChart() {
         // TODO Auto-generated constructor stub
-        data = new ArrayList<EventsOverTime>();
+        data = null;
         size = 0;
+        start = 0;
+        end = 0;
+        duration = 0;
     }
 
     public void addEventsOverTime(int eventCount, Date date) {
-        EventsOverTime a = new EventsOverTime();
-        a.setEventCount(eventCount);
-        a.setDate(date);
-        size++;
-        data.add(a);
+        if(eventCount == 1)
+        {
+            data.get((int)Math.floor((date.getTime() - start) * 1.0 / duration)).incEventCount();
+        }
+        else if(eventCount == -1)
+        {
+        	data.get((int)Math.ceil((date.getTime() - start) * 1.0 / duration)).decEventCount();
+        }
     }
     
     public int getSize(){
@@ -80,48 +81,20 @@ public class EventsOverTimeChart {
         return data.get(pos).getDate();
     }
     
-    public void setEventCount(int pos, int eventCount) {
-        data.get(pos).setEventCount(eventCount);
-    }
-    
-    public void setDate(int pos, Date date) {
-        data.get(pos).setDate(date);
-    }
-        
-    public void sort() {
-        ComparatorDate c = new ComparatorDate();
-        data.sort(c);
-    }
-
-    public void merge() {
-        List<EventsOverTime> temp = new ArrayList<EventsOverTime>();
-        long start = getDate(0).getTime();
-        long end = getDate(getSize() - 1).getTime();
-        long duration = (end - start) / 1000;
+    public void init(long start, long end){
+    	data = new ArrayList<EventsOverTime>();
+    	this.start = start;
+    	this.end = end;
+        duration = (end - start) / 1000;
         
         for(int i = 0; i <= 1000; i++)
         {
             EventsOverTime a = new EventsOverTime();
             a.setEventCount(0);
             a.setDate(new Date(duration * i + start));
-            temp.add(a);
+            data.add(a);
         }
         
-        for(int i = 0; i < getSize(); i++)
-        {
-            EventsOverTime a = data.get(i);
-            if(a.getEventCount() == 1)
-            {
-                temp.get((int)Math.floor((a.getDate().getTime() - start) * 1.0 / duration)).incEventCount();
-            }
-            else if(a.getEventCount() == -1)
-            {
-                temp.get((int)Math.ceil((a.getDate().getTime() - start) * 1.0 / duration)).decEventCount();
-            }
-        }
-        
-        data = temp;
         size = 1001;
     }
-    
 }

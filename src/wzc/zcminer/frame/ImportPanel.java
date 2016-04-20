@@ -876,25 +876,41 @@ public class ImportPanel extends JPanel{
     
     //更新ActiveCasesOverTimeChart图表
     public void setActiveCasesOverTimeChart() {
+        long start = 0;
+        long end = 0;
+        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
+            Case mycase = MainFrame.caseCollection.getCase(i);
+            if(start > mycase.getStart().getTime() || start == 0)
+            	start = mycase.getStart().getTime();
+            if(end < mycase.getEnd().getTime())
+            	end = mycase.getEnd().getTime();
+        }
+        MainFrame.activeCasesOverTimeChart.init(start, end);
         for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
             Case mycase = MainFrame.caseCollection.getCase(i);
             MainFrame.activeCasesOverTimeChart.addActiveCasesOverTime(1, mycase.getStart());
             MainFrame.activeCasesOverTimeChart.addActiveCasesOverTime(-1, mycase.getEnd());
         }
-        MainFrame.activeCasesOverTimeChart.sort();
-        MainFrame.activeCasesOverTimeChart.merge();
     }
   
     
     //更新EventsOverTimeChart图表
     public void setEventsOverTimeChart() {
+        long start = 0;
+        long end = 0;
+        for (int i = 0; i < MainFrame.eventCollection.getSize(); i++) {
+            Event event = MainFrame.eventCollection.getEvent(i);
+            if(start > event.getStartDate().getTime() || start == 0)
+            	start = event.getStartDate().getTime();
+            if(end < event.getEndDate().getTime())
+            	end = event.getEndDate().getTime();
+        }
+        MainFrame.eventsOverTimeChart.init(start, end);
         for (int i = 0; i < MainFrame.eventCollection.getSize(); i++) {
             Event event = MainFrame.eventCollection.getEvent(i);
             MainFrame.eventsOverTimeChart.addEventsOverTime(1, event.getStartDate());
             MainFrame.eventsOverTimeChart.addEventsOverTime(-1, event.getEndDate());
         }
-        MainFrame.eventsOverTimeChart.sort();
-        MainFrame.eventsOverTimeChart.merge();
     }
    
     

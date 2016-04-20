@@ -57,6 +57,17 @@ public class EventsPerCaseChart {
         data.get(mycase.getSize() - 1).addCaseCount();
     }
     
+    public void addCases(BigCase mycase) {
+        while(mycase.getSize() > data.size())
+        {
+            EventsPerCase e = new EventsPerCase();
+            e.setEventCount(data.size() + 1);
+            data.add(e);
+            size++;
+        }
+        data.get(mycase.getSize() - 1).addCaseCount();
+    }
+    
     public int getSize(){
         return size;
     }
