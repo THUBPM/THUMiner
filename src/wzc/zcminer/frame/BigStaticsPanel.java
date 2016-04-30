@@ -46,6 +46,8 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYAreaRenderer;
 
 import wzc.zcminer.global.Activity;
+import wzc.zcminer.global.BigCase;
+import wzc.zcminer.global.BigVariant;
 import wzc.zcminer.global.Case;
 import wzc.zcminer.global.Resource;
 import wzc.zcminer.global.RowSelectableJTable;
@@ -401,13 +403,13 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
         overviewTablePanel = new JTabbedPane();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-			overviewTablePanel.addTab("Cases (" + MainFrame.caseCollection.getSize() + ")", null, overviewCaseTablePanel, "Cases");
-			overviewTablePanel.addTab("Variants (" + MainFrame.variantCollection.getSize() + ")", null, overviewVariantTablePanel, "Variants");
+			overviewTablePanel.addTab("Cases (" + MainFrame.bigCaseCollection.getSize() + ")", null, overviewCaseTablePanel, "Cases");
+			overviewTablePanel.addTab("Variants (" + MainFrame.bigVariantCollection.getSize() + ")", null, overviewVariantTablePanel, "Variants");
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-			overviewTablePanel.addTab("实例(" + MainFrame.caseCollection.getSize() + ")", null, overviewCaseTablePanel, "实例");
-			overviewTablePanel.addTab("实例种类(" + MainFrame.variantCollection.getSize() + ")", null, overviewVariantTablePanel, "实例种类");
+			overviewTablePanel.addTab("实例(" + MainFrame.bigCaseCollection.getSize() + ")", null, overviewCaseTablePanel, "实例");
+			overviewTablePanel.addTab("实例种类(" + MainFrame.bigVariantCollection.getSize() + ")", null, overviewVariantTablePanel, "实例种类");
 		}
 		
 		overviewPanel = new JPanel(new BorderLayout());
@@ -704,13 +706,14 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
     
     public void updateOverviewCaseTable()
     {
-        int size = MainFrame.caseCollection.getSize();
+        int size = MainFrame.bigCaseCollection.getSize();
         if(size > 1000)
             size = 1000;
         String[][] tableData = new String[size][5];
         for(int i = 0; i < size; i++)
         {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        	BigVariant variant = MainFrame.bigVariantCollection.getVariant(-1);
+            BigCase mycase = variant.getCase(i);
             tableData[i][0] = mycase.getCase();
             tableData[i][1] = mycase.getSize() + "";
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -754,13 +757,13 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
     
     public void updateOverviewVariantTable()
     {
-        int size = MainFrame.variantCollection.getSize();
+        int size = MainFrame.bigVariantCollection.getSize();
         if(size > 1000)
             size = 1000;
         String[][] tableData = new String[size][5];
         for(int i = 0; i < size; i++)
         {
-            Variant variant = MainFrame.variantCollection.getVariant(i);
+            BigVariant variant = MainFrame.bigVariantCollection.getVariant(i);
     		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 tableData[i][0] = "Variant " + variant.getVariant();
@@ -823,41 +826,41 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
     {
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-	        overviewEventsLabel.setText("Events : " + MainFrame.eventCollection.getSize());
-	        overviewCasesLabel.setText("Cases : " + MainFrame.caseCollection.getSize());
+	        overviewEventsLabel.setText("Events : " + MainFrame.bigEventCollection.getSize());
+	        overviewCasesLabel.setText("Cases : " + MainFrame.bigCaseCollection.getSize());
 	        overviewActivitiesLabel.setText("Activities : " + (MainFrame.graphNet.activityCount - 2));
-	        long median = MainFrame.caseCollection.getMedianDuration();
+	        long median = MainFrame.bigCaseCollection.getMedianDuration();
 	        long medianMinutes = median / (60 * 1000) % 60;
 	        long medianHours = median / (60 * 60 * 1000) % 24;
 	        long medianDays = median / (24 * 60 * 60 * 1000);
 	        overviewMedianCaseDurationLabel.setText("Median case duration : " + medianDays + " days " + medianHours + " hours " + medianMinutes + " mins");
-	        long mean = MainFrame.caseCollection.getMeanDuration();
+	        long mean = MainFrame.bigCaseCollection.getMeanDuration();
 	        long meanMinutes = mean / (60 * 1000) % 60;
 	        long meanHours = mean / (60 * 60 * 1000) % 24;
 	        long meanDays = mean / (24 * 60 * 60 * 1000);
 	        overviewMeanCaseDurationLabel.setText("Mean case duration : " + meanDays + " days " + meanHours + " hours " + meanMinutes + " mins");
 	        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        overviewStartLabel.setText("Start : " + formatter.format(MainFrame.caseCollection.getStart()));
-	        overviewEndLabel.setText("End : " + formatter.format(MainFrame.caseCollection.getEnd()));
+	        overviewStartLabel.setText("Start : " + formatter.format(MainFrame.bigCaseCollection.getStart()));
+	        overviewEndLabel.setText("End : " + formatter.format(MainFrame.bigCaseCollection.getEnd()));
         }
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-	        overviewEventsLabel.setText("事件数：" + MainFrame.eventCollection.getSize());
-	        overviewCasesLabel.setText("实例数：" + MainFrame.caseCollection.getSize());
+	        overviewEventsLabel.setText("事件数：" + MainFrame.bigEventCollection.getSize());
+	        overviewCasesLabel.setText("实例数：" + MainFrame.bigCaseCollection.getSize());
 	        overviewActivitiesLabel.setText("活动数：" + (MainFrame.graphNet.activityCount - 2));
-	        long median = MainFrame.caseCollection.getMedianDuration();
+	        long median = MainFrame.bigCaseCollection.getMedianDuration();
 	        long medianMinutes = median / (60 * 1000) % 60;
 	        long medianHours = median / (60 * 60 * 1000) % 24;
 	        long medianDays = median / (24 * 60 * 60 * 1000);
 	        overviewMedianCaseDurationLabel.setText("中位实例持续时间：" + medianDays + "天" + medianHours + "小时" + medianMinutes + "分");
-	        long mean = MainFrame.caseCollection.getMeanDuration();
+	        long mean = MainFrame.bigCaseCollection.getMeanDuration();
 	        long meanMinutes = mean / (60 * 1000) % 60;
 	        long meanHours = mean / (60 * 60 * 1000) % 24;
 	        long meanDays = mean / (24 * 60 * 60 * 1000);
 	        overviewMeanCaseDurationLabel.setText("平均实例持续时间：" + meanDays + "天" + meanHours + "小时" + meanMinutes + "分");
 	        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        overviewStartLabel.setText("开始时间：" + formatter.format(MainFrame.caseCollection.getStart()));
-	        overviewEndLabel.setText("结束时间：" + formatter.format(MainFrame.caseCollection.getEnd()));
+	        overviewStartLabel.setText("开始时间：" + formatter.format(MainFrame.bigCaseCollection.getStart()));
+	        overviewEndLabel.setText("结束时间：" + formatter.format(MainFrame.bigCaseCollection.getEnd()));
 	 	}
     }
     
@@ -1033,9 +1036,9 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
     public void updateOverviewCaseVariantsChart()
     {
         XYSeries series = new XYSeries("");
-        for(int i = 0; i < MainFrame.variantCollection.getSize(); i++)
+        for(int i = 0; i < MainFrame.bigVariantCollection.getSize(); i++)
         {
-            Variant variant = MainFrame.variantCollection.getVariant(i);
+            BigVariant variant = MainFrame.bigVariantCollection.getVariant(i);
             series.add(i + 1, variant.getSize());
         }
         
@@ -1519,7 +1522,7 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
             Activity activity = MainFrame.activityCollection.getActivity(i);
             tableData[i][0] = activity.getActivity();
             tableData[i][1] = activity.getFrequency() + "";
-            tableData[i][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
+            tableData[i][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.bigEventCollection.getSize() * 100) + "%";
             if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 long median = activity.getMedianDuration();
@@ -1595,7 +1598,7 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
             {
                 tableData[j][0] = activity.getActivity();
                 tableData[j][1] = activity.getFrequency() + "";
-                tableData[j][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
+                tableData[j][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.bigEventCollection.getSize() * 100) + "%";
                 if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = activity.getMedianDuration();
@@ -1673,7 +1676,7 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
             {
                 tableData[j][0] = activity.getActivity();
                 tableData[j][1] = activity.getFrequency() + "";
-                tableData[j][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
+                tableData[j][2] = new DecimalFormat("#0.00").format(activity.getFrequency() * 1.0 / MainFrame.bigEventCollection.getSize() * 100) + "%";
                 if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = activity.getMedianDuration();
@@ -2112,7 +2115,7 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
             Resource resource = MainFrame.resourceCollection.getResource(i);
             tableData[i][0] = resource.getResource();
             tableData[i][1] = resource.getFrequency() + "";
-            tableData[i][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
+            tableData[i][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.bigEventCollection.getSize() * 100) + "%";
             if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 long median = resource.getMedianDuration();
@@ -2188,7 +2191,7 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
             {
                 tableData[j][0] = resource.getResource();
                 tableData[j][1] = resource.getFrequency() + "";
-                tableData[j][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
+                tableData[j][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.bigEventCollection.getSize() * 100) + "%";
                 if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = resource.getMedianDuration();
@@ -2266,7 +2269,7 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
             {
                 tableData[j][0] = resource.getResource();
                 tableData[j][1] = resource.getFrequency() + "";
-                tableData[j][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.eventCollection.getSize() * 100) + "%";
+                tableData[j][2] = new DecimalFormat("#0.00").format(resource.getFrequency() * 1.0 / MainFrame.bigEventCollection.getSize() * 100) + "%";
                 if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
         		{
                     long median = resource.getMedianDuration();

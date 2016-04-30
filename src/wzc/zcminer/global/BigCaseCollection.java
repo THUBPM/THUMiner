@@ -307,7 +307,9 @@ public class BigCaseCollection {
             }
             else
             {
-                return 0;
+                if(case1.getDuration() < case2.getDuration()) {return 1;}
+                else if (case1.getDuration() > case2.getDuration()) {return -1;}
+                else {return 0;}
             }
         }
     }

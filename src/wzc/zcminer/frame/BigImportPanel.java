@@ -44,6 +44,7 @@ import wzc.zcminer.global.BigAnimation;
 import wzc.zcminer.global.BigAnimation.Frame;
 import wzc.zcminer.global.BigCase;
 import wzc.zcminer.global.BigEvent;
+import wzc.zcminer.global.BigVariant;
 import wzc.zcminer.global.ColumnSelectableJTable;
 import wzc.zcminer.global.Event;
 import wzc.zcminer.global.Case;
@@ -113,7 +114,7 @@ public class BigImportPanel extends JPanel{
 			BufferedReader reader = null;
 			try{
 				read = new InputStreamReader(new FileInputStream(file), encodingText);
-				reader = new BufferedReader(read, 5*1024*1024);
+				reader = new BufferedReader(read);
 				String tempString = null;
 				
 				tempString = reader.readLine();
@@ -354,11 +355,31 @@ public class BigImportPanel extends JPanel{
 		}
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+//				long start=System.currentTimeMillis();// 当前时间对应的毫秒数
+//				BigEvent a = new BigEvent();
+//				a.setDate("9.3.10 8:05", timeText.getText());
+//				a.setDate("9.3.10 8:05", timeText.getText());
+//				
+//				long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
+//				for(int i = 0; i < 100000; i++){
+//					a.save("test");
+//				}
+//				long endMili=System.currentTimeMillis();
+//				System.out.println("save 总耗时为："+(endMili-startMili)+"毫秒");
+//				
+//				startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
+//				for(int i = 0; i < 100000; i++){
+//					a = new BigEvent("test");
+//				}
+//				endMili=System.currentTimeMillis();
+//				System.out.println("read 总耗时为："+(endMili-startMili)+"毫秒");
+				
 			    setEventCollection(fileName, separator, hasTableHead, encodingText);
 			    setGraphNet();
 			    setAnimation();
 			    setCaseCollection();
-			    //setVariantCollection();
+			    setCasePage();
+			    setVariantCollection();
 			    setEventsOverTimeChart();
 			    setActiveCasesOverTimeChart();
 			    setEventsPerCaseChart();
@@ -375,6 +396,8 @@ public class BigImportPanel extends JPanel{
 				MainFrame.mainFrame.setContentPane(mapPanel);
 				MainFrame.mainFrame.setVisible(true);
 				System.gc();
+//				long end=System.currentTimeMillis();
+//				System.out.println("all 总耗时为："+(end-start)+"毫秒");
 			}
 		});
 
@@ -412,7 +435,7 @@ public class BigImportPanel extends JPanel{
 			BufferedReader reader = null;
 			try{
 				read = new InputStreamReader(new FileInputStream(file), encodingText);
-				reader = new BufferedReader(read, 5*1024*1024);
+				reader = new BufferedReader(read);
 				String tempString = null;
 				
 				if(hasTableHead)
@@ -729,38 +752,67 @@ public class BigImportPanel extends JPanel{
    
     
     //更新variant集
+    public void setCasePage() {
+        BigVariant allVariant = new BigVariant();
+        allVariant.setVariant(0);
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstID();
+        while(mycase != null){
+            allVariant.addCase(mycase);
+        	mycase = MainFrame.bigCaseCollection.getNextID(mycase);
+        }
+        allVariant.saveCases();
+        allVariant.save();
+    }
+    
+    
+    //更新variant集
     public void setVariantCollection() {
-        MainFrame.caseCollection.sortByVariant();
-        for (int i = 0; i < MainFrame.caseCollection.getSize(); i++) {
-            Case mycase = MainFrame.caseCollection.getCase(i);
-            Variant variant = new Variant();
-            variant.setVariant((MainFrame.variantCollection.getSize()+1)+"");
+        BigCase mycase = MainFrame.bigCaseCollection.getFirstCaseVariant();
+        if (mycase == null) return;
+        BigCase nextCase = MainFrame.bigCaseCollection.getNextCaseVariant(mycase);
+        while(mycase != null){
+            BigVariant variant = new BigVariant();
+            variant.setVariant(MainFrame.bigVariantCollection.getSize()+1);
             variant.addCase(mycase);
             variant.setActivities(mycase.getActivities());
-            i++;
+            BigCase medianCase = mycase;
+            int count = 1;
             while(true)
             {
-                if(i == MainFrame.caseCollection.getSize())
-                {
-                    i--;
-                    break;
-                }
-                mycase = MainFrame.caseCollection.getCase(i);
-                if(variant.getActivities().equals(mycase.getActivities()))
-                {
-                    variant.addCase(mycase);
-                    i++;
-                }
-                else
-                {
-                    i--;
-                    break;
+            	if(nextCase == null){
+                	if(variant.getSize() % 2 == 0){
+                		variant.setMedianDuration(medianCase.getDuration());
+                		medianCase = MainFrame.bigCaseCollection.getNextCaseVariant(medianCase);
+                		variant.setMedianDuration((variant.getMedianDuration() + medianCase.getDuration()) / 2);
+                	}else{
+                		variant.setMedianDuration(medianCase.getDuration());
+                	}
+                    MainFrame.bigVariantCollection.addVariant(variant);
+                    return;
+            	}
+                if(variant.getActivities().equals(nextCase.getActivities())){
+                	mycase = nextCase;
+                	nextCase = MainFrame.bigCaseCollection.getNextCaseVariant(mycase);
+                	variant.addCase(mycase);
+                	if(variant.getSize() > count * 2){
+                		medianCase = MainFrame.bigCaseCollection.getNextCaseVariant(medianCase);
+                		count++;
+                	}
+                }else{
+                	break;
                 }
             }
-            MainFrame.variantCollection.addVariant(variant);
+        	if(variant.getSize() % 2 == 0){
+        		variant.setMedianDuration(medianCase.getDuration());
+        		medianCase = MainFrame.bigCaseCollection.getNextCaseVariant(medianCase);
+        		variant.setMedianDuration((variant.getMedianDuration() + medianCase.getDuration()) / 2);
+        	}else{
+        		variant.setMedianDuration(medianCase.getDuration());
+        	}
+            MainFrame.bigVariantCollection.addVariant(variant);
+        	mycase = nextCase;
+        	nextCase = MainFrame.bigCaseCollection.getNextCaseVariant(mycase);
         }
-        MainFrame.caseCollection.sortByID();
-        MainFrame.variantCollection.sortAndMerge();
     }
 	
     

@@ -20,6 +20,7 @@ import wzc.zcminer.global.ActivityCollection;
 import wzc.zcminer.global.BigAnimation;
 import wzc.zcminer.global.BigCaseCollection;
 import wzc.zcminer.global.BigEventCollection;
+import wzc.zcminer.global.BigVariantCollection;
 import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.CaseDurationChart;
 import wzc.zcminer.global.CaseUtilizationChart;
@@ -261,6 +262,7 @@ public class BigFileButton extends JButton{
                         MainFrame.resourceCollection = new ResourceCollection();
                         MainFrame.bigEventCollection = new BigEventCollection();
                         MainFrame.bigCaseCollection = new BigCaseCollection();
+                        MainFrame.bigVariantCollection = new BigVariantCollection();
 						MainFrame.bigAnimation = new BigAnimation();
 						
                         MainFrame.mainFrame.getContentPane().removeAll();

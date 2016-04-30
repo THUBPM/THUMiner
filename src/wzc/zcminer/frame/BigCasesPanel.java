@@ -5,14 +5,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,6 +43,9 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
+import wzc.zcminer.global.BigCase;
+import wzc.zcminer.global.BigEvent;
+import wzc.zcminer.global.BigVariant;
 import wzc.zcminer.global.Case;
 import wzc.zcminer.global.Event;
 import wzc.zcminer.global.RowSelectableJTable;
@@ -63,6 +71,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     static DefaultListModel<String> variantsListModel;
     static JScrollPane variantsListScroller;
     //case选择版面
+    static JComboBox<String> caseComboBox;
     static JPanel casesPanel;
     static JPanel casesLabelPanel;
     static JPanel casesListPanel;
@@ -99,9 +108,11 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     Object[] v;
 	//切换页面
 	static ButtonPanel buttonPanel;
+	static boolean flag;
 
 	public BigCasesPanel() {
 		// TODO Auto-generated constructor stub
+		flag = false;
 
 		setLayout(new BorderLayout());
 		
@@ -109,34 +120,34 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
 	    variantsLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-		    variantsLabelPanel.add(new JLabel("Variants(" + MainFrame.variantCollection.getSize() + ")"));
+		    variantsLabelPanel.add(new JLabel("Variants(" + MainFrame.bigVariantCollection.getSize() + ")"));
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-		    variantsLabelPanel.add(new JLabel("实例种类(" + MainFrame.variantCollection.getSize() + ")"));
+		    variantsLabelPanel.add(new JLabel("实例种类(" + MainFrame.bigVariantCollection.getSize() + ")"));
 		}
 		
 		variantsListModel = new DefaultListModel<String>();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-			variantsListModel.addElement("Complete Log(" + MainFrame.caseCollection.getSize() + " cases)");
+			variantsListModel.addElement("Complete Log(" + MainFrame.bigCaseCollection.getSize() + " cases)");
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-			variantsListModel.addElement("所有实例(" + MainFrame.caseCollection.getSize() + "实例)");
+			variantsListModel.addElement("所有实例(" + MainFrame.bigCaseCollection.getSize() + "实例)");
 		}
-		for(int i = 0; i < MainFrame.variantCollection.getSize(); i++)
+		for(int i = 0; i < MainFrame.bigVariantCollection.getSize(); i++)
 		{
-		    Variant variant = MainFrame.variantCollection.getVariant(i);
+		    BigVariant variant = MainFrame.bigVariantCollection.getVariant(i);
 			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 			{
 			    variantsListModel.addElement("Variant " + variant.getVariant() + " (" + variant.getSize() + "实例(" +
-			            (new DecimalFormat("#0.00").format(1.0 * variant.getSize() / MainFrame.caseCollection.getSize() * 100)) + "%))");
+			            (new DecimalFormat("#0.00").format(1.0 * variant.getSize() / MainFrame.bigCaseCollection.getSize() * 100)) + "%))");
 			}
 			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 			{
 			    variantsListModel.addElement("实例种类" + variant.getVariant() + " (" + variant.getSize() + "实例(" +
-			            (new DecimalFormat("#0.00").format(1.0 * variant.getSize() / MainFrame.caseCollection.getSize() * 100)) + "%))");
+			            (new DecimalFormat("#0.00").format(1.0 * variant.getSize() / MainFrame.bigCaseCollection.getSize() * 100)) + "%))");
 			}
 		}
 		
@@ -145,6 +156,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
 		variantsList.addListSelectionListener(new ListSelectionListener(){
 		    public void valueChanged(ListSelectionEvent e) {
 		        if (e.getValueIsAdjusting() == false) {
+		        	flag = true;
 		            int selectedValue = variantsList.getSelectedIndex();
     	            if (selectedValue == -1)
     	            {
@@ -154,9 +166,16 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     	            else if(selectedValue == 0)
     	            {
     	                casesListModel = new DefaultListModel<String>();
-    	                for(int i = 0; i < MainFrame.caseCollection.getSize(); i++)
+	                	BigVariant variant = MainFrame.bigVariantCollection.getVariant(-1);
+	                	caseComboBox.removeAllItems();
+    	                for(int i = 0; i <= (variant.getSize() - 1) / 1000; i++){
+    	                	caseComboBox.addItem("第" + (i + 1) + "页");
+    	                }
+    	                int pageSelectedValue = caseComboBox.getSelectedIndex();
+    	                for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
     	                {
-    	                    Case mycase = MainFrame.caseCollection.getCase(i);
+    	                	if(i >= variant.getSize()) break;
+    	                    BigCase mycase = variant.getCase(i);
     	        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     	        			{
         	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
@@ -172,10 +191,16 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     	            else
     	            {
     	                casesListModel = new DefaultListModel<String>();
-    	                Variant variant = MainFrame.variantCollection.getVariant(selectedValue - 1);
-                        for(int i = 0; i < variant.getSize(); i++)
-                        {
-                            Case mycase = variant.getCase(i);
+    	                BigVariant variant = MainFrame.bigVariantCollection.getVariant(selectedValue - 1);
+    	                caseComboBox.removeAllItems();
+    	                for(int i = 0; i <= (variant.getSize() - 1) / 1000; i++){
+    	                	caseComboBox.addItem("第" + (i + 1) + "页");
+    	                }
+    	                int pageSelectedValue = caseComboBox.getSelectedIndex();
+    	                for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
+    	                {
+    	                	if(i >= variant.getSize()) break;
+                            BigCase mycase = variant.getCase(i);
     	        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     	        			{
                                 casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
@@ -189,6 +214,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     	                casesList.setSelectedIndex(0);
     	            }
                     refresh();
+		        	flag = false;
 		        }
 		    }
 	    });
@@ -209,17 +235,24 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
         casesLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-	        casesLabelPanel.add(new JLabel("Cases(" + MainFrame.caseCollection.getSize() + ")"));
+	        casesLabelPanel.add(new JLabel("Cases(" + MainFrame.bigCaseCollection.getSize() + ")"));
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-	        casesLabelPanel.add(new JLabel("实例(" + MainFrame.caseCollection.getSize() + ")"));
+	        casesLabelPanel.add(new JLabel("实例(" + MainFrame.bigCaseCollection.getSize() + ")"));
 		}
         
         casesListModel = new DefaultListModel<String>();
-        for(int i = 0; i < MainFrame.caseCollection.getSize(); i++)
+        BigVariant variant = MainFrame.bigVariantCollection.getVariant(-1);
+        caseComboBox = new JComboBox<String>();
+        for(int i = 0; i <= (variant.getSize() - 1) / 1000; i++){
+        	caseComboBox.addItem("第" + (i + 1) + "页");
+        }
+        int pageSelectedValue = caseComboBox.getSelectedIndex();
+        for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
         {
-            Case mycase = MainFrame.caseCollection.getCase(i);
+        	if(i >= variant.getSize()) break;
+            BigCase mycase = variant.getCase(i);
     		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
                 casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
@@ -248,8 +281,70 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
         casesListPanel.setLayout(new BorderLayout(5, 5));
         casesListPanel.add(casesListScroller);
         
+        caseComboBox.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+                if(e.getStateChange() == ItemEvent.SELECTED)
+                {
+                	if(flag) return;
+		            int selectedValue = variantsList.getSelectedIndex();
+    	            if (selectedValue == -1)
+    	            {
+                        casesListModel = new DefaultListModel<String>();
+                        casesList.setModel(casesListModel);
+    	            }
+    	            else if(selectedValue == 0)
+    	            {
+    	                casesListModel = new DefaultListModel<String>();
+	                	BigVariant variant = MainFrame.bigVariantCollection.getVariant(-1);
+    	                int pageSelectedValue = caseComboBox.getSelectedIndex();
+    	                for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
+    	                {
+    	                	if(i >= variant.getSize()) break;
+    	                    BigCase mycase = variant.getCase(i);
+    	        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+    	        			{
+        	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
+    	        			}
+    	        			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+    	        			{
+        	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
+        	        		}
+    	                }
+    	                casesList.setModel(casesListModel);
+    	                casesList.setSelectedIndex(0);
+    	            }
+    	            else
+    	            {
+    	                casesListModel = new DefaultListModel<String>();
+    	                BigVariant variant = MainFrame.bigVariantCollection.getVariant(selectedValue - 1);
+    	                int pageSelectedValue = caseComboBox.getSelectedIndex();
+    	                for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
+    	                {
+    	                	if(i >= variant.getSize()) break;
+                            BigCase mycase = variant.getCase(i);
+    	        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+    	        			{
+                                casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
+    	        			}
+    	        			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+    	        			{
+                                casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
+        	        		}
+                        }
+    	                casesList.setModel(casesListModel);
+    	                casesList.setSelectedIndex(0);
+    	            }
+                    refresh();
+                }
+
+			}
+        });
+        
         casesPanel = new JPanel(new BorderLayout());
         casesPanel.add(casesLabelPanel, BorderLayout.PAGE_START);
+        casesPanel.add(caseComboBox, BorderLayout.SOUTH);
         casesPanel.add(casesListPanel, BorderLayout.CENTER);
 		
         selectPanel = new JPanel(new BorderLayout());
@@ -330,7 +425,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
         add(showPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.NORTH);
 
-        creatChart(MainFrame.caseCollection.getCase(0));
+        creatChart(MainFrame.bigCaseCollection.getFirstID());
         refresh();
 	}
 	
@@ -361,10 +456,12 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     {
         int caseSelectedValue = casesList.getSelectedIndex();
         int variantSelectedValue = variantsList.getSelectedIndex();
+        int pageSelectedValue = caseComboBox.getSelectedIndex();
         if (caseSelectedValue == -1 || variantSelectedValue == -1){}
         else if(variantSelectedValue == 0)
         {
-            Case mycase = MainFrame.caseCollection.getCase(caseSelectedValue);
+        	BigVariant variant = MainFrame.bigVariantCollection.getVariant(-1);
+            BigCase mycase = variant.getCase(pageSelectedValue * 1000 + caseSelectedValue);
             updateTable(mycase);
             updateGraph(mycase);
             updateLabel(mycase);
@@ -372,8 +469,8 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
         }
         else
         {
-            Variant variant = MainFrame.variantCollection.getVariant(variantSelectedValue - 1);
-            Case mycase = variant.getCase(caseSelectedValue);
+            BigVariant variant = MainFrame.bigVariantCollection.getVariant(variantSelectedValue - 1);
+            BigCase mycase = variant.getCase(pageSelectedValue * 1000 + caseSelectedValue);
             updateTable(mycase);
             updateGraph(mycase);
             updateLabel(mycase);
@@ -382,7 +479,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     }
     
     
-    public void creatChart(Case mycase)
+    public void creatChart(BigCase mycase)
     {
         TimeSeries casesSeries = new TimeSeries("");
         int count = 0;
@@ -455,7 +552,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     }
     
     
-    public void updateChart(Case mycase)
+    public void updateChart(BigCase mycase)
     {
         TimeSeries caseSeries = dataset.getSeries(0);
         
@@ -481,7 +578,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     }
     
     
-    public void updateLabel(Case mycase)
+    public void updateLabel(BigCase mycase)
     {
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
@@ -512,12 +609,12 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     }
     
     
-    public void updateTable(Case mycase)
+    public void updateTable(BigCase mycase)
     {
         String[][] tableData = new String[mycase.getSize()][5];
         for(int i = 0; i < mycase.getSize(); i++)
         {
-            Event event = mycase.getEvent(i);
+            BigEvent event = mycase.getEvent(i);
             tableData[i][0] = event.getActivity();
             tableData[i][1] = event.getResource();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -550,7 +647,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
     }
     
     
-    public void updateGraph(Case mycase)
+    public void updateGraph(BigCase mycase)
     {
         graph.getModel().beginUpdate();
         
@@ -560,7 +657,7 @@ public class BigCasesPanel extends JPanel implements ComponentListener {
         
         for(int i = 0; i < mycase.getSize(); i++)
         {
-            Event event = mycase.getEvent(i);
+            BigEvent event = mycase.getEvent(i);
             long diff = event.getTime();
             long diffMinutes = diff / (60 * 1000) % 60;
             long diffHours = diff / (60 * 60 * 1000) % 24;

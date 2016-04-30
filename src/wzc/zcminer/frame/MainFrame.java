@@ -21,6 +21,7 @@ import wzc.zcminer.global.ActivityCollection;
 import wzc.zcminer.global.BigAnimation;
 import wzc.zcminer.global.BigCaseCollection;
 import wzc.zcminer.global.BigEventCollection;
+import wzc.zcminer.global.BigVariantCollection;
 import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.CaseDurationChart;
 import wzc.zcminer.global.CaseUtilizationChart;
@@ -53,16 +54,7 @@ public class MainFrame {
 	static BigEventCollection bigEventCollection;
 	static BigAnimation bigAnimation;
 	static BigCaseCollection bigCaseCollection;
-	//static VariantCollection variantCollection;
-	//static ActiveCasesOverTimeChart activeCasesOverTimeChart;
-	//static EventsOverTimeChart eventsOverTimeChart;
-	//static EventsPerCaseChart eventsPerCaseChart;
-	//static CaseDurationChart caseDurationChart;
-	//static CaseUtilizationChart caseUtilizationChart;
-	//static MeanActivityDurationChart meanActivityDurationChart;
-	//static MeanWaitingTimeChart meanWaitingTimeChart;
-	//static ActivityCollection activityCollection;
-	//static ResourceCollection resourceCollection;
+	static BigVariantCollection bigVariantCollection;
 	static int dataSource = 0; //0:file 1:database 2:big file
 	static Connection oracleConnection = null;
 	static PreparedStatement oracleStatement = null;

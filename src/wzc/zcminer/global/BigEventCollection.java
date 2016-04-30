@@ -332,6 +332,7 @@ public class BigEventCollection {
 	}
 
 	public void addEvent(BigEvent c) {
+//		long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
 		UUID uuid = UUID.randomUUID();
 		String fileName = uuid.toString();
 		
@@ -629,6 +630,8 @@ public class BigEventCollection {
 		}
         
 	    size++;
+//		long endMili=System.currentTimeMillis();
+//		System.out.println("add " + c.getCase() + " 总耗时为："+(endMili-startMili)+"毫秒");
 	}
 	
 	public int getSize(){

@@ -180,7 +180,7 @@ public class BigCase {
 	        FileWriter fw = new FileWriter(path);
 	        setFileName(fileName);
 	        String str = getFileName() + "\n" + getCase() + "\n" + getSize() + "\n" + getStart().getTime() + "\n" + getEnd().getTime() + "\n" + getDuration() + "\n" + getActive()
-	        		+ "\n" + String.join(",", activities.toArray(new String[]{})) + "\n" + String.join(",", eventList.toArray(new String[]{}))
+	        		+ "\n" + String.join("\t", activities.toArray(new String[]{})) + "\n" + String.join("\t", eventList.toArray(new String[]{}))
 	        		+ "\n" + getLeftChildID() + "\n" + getRightChildID() + "\n" + getParentID() + "\n" + getWhichChildID() + "\n" + getHeightID()
 	        		+ "\n" + getLeftChildDuration() + "\n" + getRightChildDuration() + "\n" + getParentDuration() + "\n" + getWhichChildDuration() + "\n" + getHeightDuration()
 	        		+ "\n" + getLeftChildCaseVariant() + "\n" + getRightChildCaseVariant() + "\n" + getParentCaseVariant() + "\n" + getWhichChildCaseVariant() + "\n" + getHeightCaseVariant();

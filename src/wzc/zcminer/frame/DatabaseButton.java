@@ -182,6 +182,7 @@ public class DatabaseButton extends JButton{
 		                    MainFrame.bigEventCollection = null;
 							MainFrame.bigAnimation = null;
 							MainFrame.bigCaseCollection = null;
+							MainFrame.bigVariantCollection = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();
@@ -351,6 +352,7 @@ public class DatabaseButton extends JButton{
 		                    MainFrame.bigEventCollection = null;
 							MainFrame.bigAnimation = null;
 							MainFrame.bigCaseCollection = null;
+							MainFrame.bigVariantCollection = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();
@@ -577,6 +579,7 @@ public class DatabaseButton extends JButton{
 							MainFrame.bigEventCollection = null;
 							MainFrame.bigAnimation = null;
 							MainFrame.bigCaseCollection = null;
+							MainFrame.bigVariantCollection = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();

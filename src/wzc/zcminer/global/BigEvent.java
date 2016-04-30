@@ -3,9 +3,12 @@ package wzc.zcminer.global;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -96,12 +99,22 @@ public class BigEvent {
 	}
 	
 	public BigEvent(String fileName) {
+//		long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
 		// TODO Auto-generated constructor stub
     	try {
 			File file = new File("data_tmp//event//" + fileName);
 			InputStreamReader read = null;
 			BufferedReader reader = null;
 			try{
+//				long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
+//				for(int i = 0; i < 100000; i++){
+//					read = new InputStreamReader(new FileInputStream(file));
+//					reader = new BufferedReader(read);
+//					reader.close();
+//					read.close();
+//				}
+//				long endMili=System.currentTimeMillis();
+//				System.out.println("str 总耗时为："+(endMili-startMili)+"毫秒");
 				read = new InputStreamReader(new FileInputStream(file));
 				reader = new BufferedReader(read);
 				String tempString = null;
@@ -174,23 +187,43 @@ public class BigEvent {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+//		long endMili=System.currentTimeMillis();
+//		System.out.println("read " + caseID + " 总耗时为："+(endMili-startMili)+"毫秒");
 	}
 	
 	public void save(String fileName) {
+//		long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
+		FileOutputStream fos = null;
+		FileChannel fc = null;
 	    try{
 	        String path = "data_tmp\\event\\" + fileName;
 	        createFile(path);
-	        FileWriter fw = new FileWriter(path);
+	        //FileWriter fw = new FileWriter(path);
+	        fos=new FileOutputStream(path);
+	        fc=fos.getChannel();
 	        setFileName(fileName);
 	        String str = getFileName() + "\n" + getCase() + "\n" + getActivity() + "\n" + getResource() + "\n" + getStartDate().getTime() + "\n" + getEndDate().getTime() + "\n" + getFirst() + "\n" + getLast()
 	        		+ "\n" + getLeftChildEventID() + "\n" + getRightChildEventID() + "\n" + getParentEventID() + "\n" + getWhichChildEventID() + "\n" + getHeightEventID()
 	        		+ "\n" + getLeftChildActivity() + "\n" + getRightChildActivity() + "\n" + getParentActivity() + "\n" + getWhichChildActivity() + "\n" + getHeightActivity()
 	        		+ "\n" + getLeftChildResource() + "\n" + getRightChildResource() + "\n" + getParentResource() + "\n" + getWhichChildResource() + "\n" + getHeightResource();
-	        fw.write(str);
-	        fw.close();
+	        ByteBuffer buffer = ByteBuffer.wrap(str.getBytes());
+	        buffer.put(str.getBytes());
+	        buffer.flip();
+	        fc.write(buffer);
+	        //fw.write(str);
+	        //fw.close();
 	    }catch(IOException ex){
 	        System.out.println(ex.getStackTrace());
+	    }finally{
+	    	try {
+	    		fc.close();
+	    		fos.close();
+	    	} catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
 	    }
+//		long endMili=System.currentTimeMillis();
+//		System.out.println("save " + caseID + " 总耗时为："+(endMili-startMili)+"毫秒");
 	}
 	
     public void setFileName(String fileNameUUID) {

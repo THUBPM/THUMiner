@@ -6,48 +6,24 @@ import java.util.List;
 
 //variant集合类
 public class BigVariantCollection {
-    
-    private class ComparatorVariant implements Comparator<Variant>{
-        public int compare(Variant variant1, Variant variant2) {
-            if(variant1.getSize() < variant2.getSize()) {return 1;}
-            else if (variant1.getSize() > variant2.getSize()) {return -1;}
-            else {return 0;}
-        }
-    }
-    
-	List<Variant> variants;
+	int count;
 
 	public BigVariantCollection() {
 		// TODO Auto-generated constructor stub
-	    variants = new ArrayList<Variant>();
+		count = 0;
 	}
 
-	public void addVariant(Variant c) {
-	    variants.add(c);
+	public void addVariant(BigVariant c) {
+	    c.save();
+	    c.saveCases();
+	    count++;
 	}
 	
 	public int getSize(){
-		return variants.size();
+		return count;
 	}
 	
-	public Variant getVariant(int pos) {
-		return variants.get(pos);
+	public BigVariant getVariant(int pos) {
+		return new BigVariant(pos + 1);
 	}
-	
-	public void setVariant(int pos, Variant v) {
-	    variants.set(pos, v);
-	}
-	
-    public void sortAndMerge() {
-        ComparatorVariant c = new ComparatorVariant();
-        variants.sort(c);
-        
-        int size = getSize();
-        
-        for(int i = 0; i < size; i++)
-        {
-            Variant variant = getVariant(i);
-            variant.setVariant("" + (i + 1));
-        }
-    }
 }
