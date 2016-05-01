@@ -6,12 +6,16 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -183,6 +187,9 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
     //overview表格版面
     static JTabbedPane overviewTablePanel;
     //overview-case表格显示
+    static JComboBox<String> caseComboBox;
+    static BigVariant variant;
+    static JComponent overviewCasePanel;
     static JComponent overviewCaseTablePanel;
     static RowSelectableJTable overviewCaseTable;
     static DefaultTableModel overviewCaseTableModel;
@@ -396,19 +403,23 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
 		overviewStaticPanel.add(overviewLabelPanel, BorderLayout.EAST);
 		overviewStaticPanel.add(overviewChartPanel, BorderLayout.CENTER);
 		
-		overviewCaseTable = new RowSelectableJTable();
+        caseComboBox = new JComboBox<String>();
+        overviewCaseTable = new RowSelectableJTable();
 		overviewCaseTablePanel = new JScrollPane(overviewCaseTable);
+		overviewCasePanel = new JPanel(new BorderLayout());
+		overviewCasePanel.add(caseComboBox, BorderLayout.SOUTH);
+		overviewCasePanel.add(overviewCaseTablePanel, BorderLayout.CENTER);
         overviewVariantTable = new RowSelectableJTable();
 		overviewVariantTablePanel = new JScrollPane(overviewVariantTable);
         overviewTablePanel = new JTabbedPane();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
-			overviewTablePanel.addTab("Cases (" + MainFrame.bigCaseCollection.getSize() + ")", null, overviewCaseTablePanel, "Cases");
+			overviewTablePanel.addTab("Cases (" + MainFrame.bigCaseCollection.getSize() + ")", null, overviewCasePanel, "Cases");
 			overviewTablePanel.addTab("Variants (" + MainFrame.bigVariantCollection.getSize() + ")", null, overviewVariantTablePanel, "Variants");
 		}
 		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
 		{
-			overviewTablePanel.addTab("实例(" + MainFrame.bigCaseCollection.getSize() + ")", null, overviewCaseTablePanel, "实例");
+			overviewTablePanel.addTab("实例(" + MainFrame.bigCaseCollection.getSize() + ")", null, overviewCasePanel, "实例");
 			overviewTablePanel.addTab("实例种类(" + MainFrame.bigVariantCollection.getSize() + ")", null, overviewVariantTablePanel, "实例种类");
 		}
 		
@@ -706,30 +717,78 @@ public class BigStaticsPanel extends JPanel implements ComponentListener {
     
     public void updateOverviewCaseTable()
     {
-        int size = MainFrame.bigCaseCollection.getSize();
-        if(size > 1000)
-            size = 1000;
-        String[][] tableData = new String[size][5];
-        for(int i = 0; i < size; i++)
+        variant = MainFrame.bigVariantCollection.getVariant(-1);
+        for(int i = 0; i <= (variant.getSize() - 1) / 1000; i++){
+        	caseComboBox.addItem("第" + (i + 1) + "页");
+        }
+    	
+        caseComboBox.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+                if(e.getStateChange() == ItemEvent.SELECTED)
+                {
+                    String[][] tableData = new String[1000][5];
+                    int pageSelectedValue = caseComboBox.getSelectedIndex();
+                    for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
+                    {
+                    	if(i >= variant.getSize()) break;
+                        BigCase mycase = variant.getCase(i);
+                        tableData[i % 1000][0] = mycase.getCase();
+                        tableData[i % 1000][1] = mycase.getSize() + "";
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        tableData[i % 1000][2] = formatter.format(mycase.getStart());
+                        tableData[i % 1000][3] = formatter.format(mycase.getEnd());
+                        long diff = mycase.getDuration();
+                        long diffMinutes = diff / (60 * 1000) % 60;
+                        long diffHours = diff / (60 * 60 * 1000) % 24;
+                        long diffDays = diff / (24 * 60 * 60 * 1000);
+                		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+                		{
+                            tableData[i % 1000][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
+                        }
+                		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+                		{
+                            tableData[i % 1000][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
+                	 	}
+                    }
+            		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+            		{
+            	        String[] headlines = {"Case ID","Events","Started","Finished","Duration"};
+            	        overviewCaseTableModel = new DefaultTableModel(tableData, headlines);
+                    }
+            		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+            		{
+            	        String[] headlines = {"实例名","事件数","开始时间","结束时间","持续时间"};
+            	        overviewCaseTableModel = new DefaultTableModel(tableData, headlines);
+            	 	}
+                    overviewCaseTable.setModel(overviewCaseTableModel);
+	            }
+			}
+        });
+        
+        String[][] tableData = new String[1000][5];
+        int pageSelectedValue = caseComboBox.getSelectedIndex();
+        for(int i = pageSelectedValue * 1000; i < (pageSelectedValue + 1) * 1000; i++)
         {
-        	BigVariant variant = MainFrame.bigVariantCollection.getVariant(-1);
+        	if(i >= variant.getSize()) break;
             BigCase mycase = variant.getCase(i);
-            tableData[i][0] = mycase.getCase();
-            tableData[i][1] = mycase.getSize() + "";
+            tableData[i % 1000][0] = mycase.getCase();
+            tableData[i % 1000][1] = mycase.getSize() + "";
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            tableData[i][2] = formatter.format(mycase.getStart());
-            tableData[i][3] = formatter.format(mycase.getEnd());
+            tableData[i % 1000][2] = formatter.format(mycase.getStart());
+            tableData[i % 1000][3] = formatter.format(mycase.getEnd());
             long diff = mycase.getDuration();
             long diffMinutes = diff / (60 * 1000) % 60;
             long diffHours = diff / (60 * 60 * 1000) % 24;
             long diffDays = diff / (24 * 60 * 60 * 1000);
     		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
     		{
-                tableData[i][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
+                tableData[i % 1000][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
             }
     		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
     		{
-                tableData[i][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
+                tableData[i % 1000][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
     	 	}
         }
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
