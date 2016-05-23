@@ -175,6 +175,12 @@ public class DatabaseButton extends JButton{
 								MainFrame.oracleConnection.close();
 							if (MainFrame.mongoClient != null)
 								MainFrame.mongoClient.close();
+					        if (MainFrame.derbyResult != null)
+					        	MainFrame.derbyResult.close();
+					        if (MainFrame.derbyStatement != null)
+					        	MainFrame.derbyStatement.close();
+							if (MainFrame.derbyConnection != null)
+								MainFrame.derbyConnection.close();
 
 		                    Class.forName(driver);
 		                    MainFrame.oracleConnection = DriverManager.getConnection(url, username, password);
@@ -183,6 +189,10 @@ public class DatabaseButton extends JButton{
 							MainFrame.bigAnimation = null;
 							MainFrame.bigCaseCollection = null;
 							MainFrame.bigVariantCollection = null;
+	                        MainFrame.bigEventCollectionDerby = null;
+	                        MainFrame.bigCaseCollectionDerby = null;
+	                        MainFrame.bigVariantCollectionDerby = null;
+							MainFrame.bigAnimationDerby = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();
@@ -341,6 +351,12 @@ public class DatabaseButton extends JButton{
 									MainFrame.oracleConnection.close();
 								if (MainFrame.mongoClient != null)
 									MainFrame.mongoClient.close();
+						        if (MainFrame.derbyResult != null)
+						        	MainFrame.derbyResult.close();
+						        if (MainFrame.derbyStatement != null)
+						        	MainFrame.derbyStatement.close();
+								if (MainFrame.derbyConnection != null)
+									MainFrame.derbyConnection.close();
 			                } catch (Exception e1) {
 			                    e1.printStackTrace();
 			                }
@@ -353,6 +369,10 @@ public class DatabaseButton extends JButton{
 							MainFrame.bigAnimation = null;
 							MainFrame.bigCaseCollection = null;
 							MainFrame.bigVariantCollection = null;
+	                        MainFrame.bigEventCollectionDerby = null;
+	                        MainFrame.bigCaseCollectionDerby = null;
+	                        MainFrame.bigVariantCollectionDerby = null;
+							MainFrame.bigAnimationDerby = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();
@@ -561,6 +581,12 @@ public class DatabaseButton extends JButton{
 								MainFrame.oracleConnection.close();
 							if (MainFrame.mongoClient != null)
 								MainFrame.mongoClient.close();
+					        if (MainFrame.derbyResult != null)
+					        	MainFrame.derbyResult.close();
+					        if (MainFrame.derbyStatement != null)
+					        	MainFrame.derbyStatement.close();
+							if (MainFrame.derbyConnection != null)
+								MainFrame.derbyConnection.close();
 							
 							if(!username.equals("") && !password.equals(""))
 							{
@@ -580,6 +606,10 @@ public class DatabaseButton extends JButton{
 							MainFrame.bigAnimation = null;
 							MainFrame.bigCaseCollection = null;
 							MainFrame.bigVariantCollection = null;
+	                        MainFrame.bigEventCollectionDerby = null;
+	                        MainFrame.bigCaseCollectionDerby = null;
+	                        MainFrame.bigVariantCollectionDerby = null;
+							MainFrame.bigAnimationDerby = null;
 		                    MainFrame.eventCollection = new EventCollection();
 	                        MainFrame.graphNet = new GraphNet();
 	                        MainFrame.variantCollection = new VariantCollection();

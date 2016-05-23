@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.swing.*;
@@ -19,9 +20,13 @@ import com.mongodb.MongoClient;
 import wzc.zcminer.global.ActiveCasesOverTimeChart;
 import wzc.zcminer.global.ActivityCollection;
 import wzc.zcminer.global.BigAnimation;
+import wzc.zcminer.global.BigAnimationDerby;
 import wzc.zcminer.global.BigCaseCollection;
+import wzc.zcminer.global.BigCaseCollectionDerby;
 import wzc.zcminer.global.BigEventCollection;
+import wzc.zcminer.global.BigEventCollectionDerby;
 import wzc.zcminer.global.BigVariantCollection;
+import wzc.zcminer.global.BigVariantCollectionDerby;
 import wzc.zcminer.global.CaseCollection;
 import wzc.zcminer.global.CaseDurationChart;
 import wzc.zcminer.global.CaseUtilizationChart;
@@ -55,16 +60,23 @@ public class MainFrame {
 	static BigAnimation bigAnimation;
 	static BigCaseCollection bigCaseCollection;
 	static BigVariantCollection bigVariantCollection;
+	static BigEventCollectionDerby bigEventCollectionDerby;
+	static BigAnimationDerby bigAnimationDerby;
+	static BigCaseCollectionDerby bigCaseCollectionDerby;
+	static BigVariantCollectionDerby bigVariantCollectionDerby;
 	static int dataSource = 0; //0:file 1:database 2:big file
 	static Connection oracleConnection = null;
 	static PreparedStatement oracleStatement = null;
 	static ResultSet oracleResult = null;
 	static MongoClient mongoClient = null;
+	public static Connection derbyConnection = null;
+	public static PreparedStatement derbyStatement = null;
+	public static ResultSet derbyResult = null;
 
 	static JFrame mainFrame;
 	static FileButton fileButton;
 	static DatabaseButton databaseButton;
-	static BigFileButton bigFileButton;
+	static BigFileButtonDerby bigFileButton;
 	
 	static Properties properties;
 	static String filename;
@@ -84,7 +96,7 @@ public class MainFrame {
 
 		fileButton = new FileButton();
 		databaseButton = new DatabaseButton();
-		bigFileButton = new BigFileButton();
+		bigFileButton = new BigFileButtonDerby();
 
 		startPanel.setLayout(new BorderLayout());
 

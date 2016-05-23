@@ -9,7 +9,7 @@ import javax.swing.*;
 public class ButtonPanel extends JPanel{
 	static FileButton fileButton;
 	static DatabaseButton databaseButton;
-	static BigFileButton bigFileButton;
+	static BigFileButtonDerby bigFileButton;
 	static JButton mapButton;
 	static JButton staticsButton;
 	static JButton casesButton;
@@ -19,7 +19,7 @@ public class ButtonPanel extends JPanel{
 		
 		fileButton = new FileButton();
 		databaseButton = new DatabaseButton();
-		bigFileButton = new BigFileButton();
+		bigFileButton = new BigFileButtonDerby();
 
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
@@ -37,7 +37,7 @@ public class ButtonPanel extends JPanel{
                 	MapPanel mapPanel = new MapPanel();
                 	MainFrame.mainFrame.setContentPane(mapPanel);
                 }else if(MainFrame.dataSource == 2){
-                	BigMapPanel mapPanel = new BigMapPanel();
+                	BigMapPanelDerby mapPanel = new BigMapPanelDerby();
                 	MainFrame.mainFrame.setContentPane(mapPanel);
                 }
                 MainFrame.mainFrame.setVisible(true);
@@ -61,7 +61,7 @@ public class ButtonPanel extends JPanel{
                     StaticsPanel staticsPanel = new StaticsPanel();
                     MainFrame.mainFrame.setContentPane(staticsPanel);
                 }else if(MainFrame.dataSource == 2){
-                    BigStaticsPanel staticsPanel = new BigStaticsPanel();
+                    BigStaticsPanelDerby staticsPanel = new BigStaticsPanelDerby();
                     MainFrame.mainFrame.setContentPane(staticsPanel);
                 }
                 MainFrame.mainFrame.setVisible(true);
@@ -85,7 +85,7 @@ public class ButtonPanel extends JPanel{
                     CasesPanel casesPanel = new CasesPanel();
                     MainFrame.mainFrame.setContentPane(casesPanel);
                 }else if(MainFrame.dataSource == 2){
-                    BigCasesPanel casesPanel = new BigCasesPanel();
+                    BigCasesPanelDerby casesPanel = new BigCasesPanelDerby();
                     MainFrame.mainFrame.setContentPane(casesPanel);
                 }
                 MainFrame.mainFrame.setVisible(true);

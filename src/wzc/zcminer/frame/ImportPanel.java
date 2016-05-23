@@ -61,7 +61,7 @@ public class ImportPanel extends JPanel{
 	static ButtonGroup buttonGroup;
 	static FileButton fileButton;
 	static DatabaseButton databaseButton;
-	static BigFileButton bigFileButton;
+	static BigFileButtonDerby bigFileButton;
 	static JTextField timeText; //时间模式输入
 	static JButton okButton;
 	final static int MAXHEADINDEX = 20;
@@ -477,7 +477,7 @@ public class ImportPanel extends JPanel{
 
 		fileButton = new FileButton();
 		databaseButton = new DatabaseButton();
-		bigFileButton = new BigFileButton();
+		bigFileButton = new BigFileButtonDerby();
 
         radioPanel.add(fileButton);
         radioPanel.add(databaseButton);

@@ -232,6 +232,12 @@ public class FileButton extends JButton{
 								MainFrame.oracleConnection.close();
 							if (MainFrame.mongoClient != null)
 								MainFrame.mongoClient.close();
+					        if (MainFrame.derbyResult != null)
+					        	MainFrame.derbyResult.close();
+					        if (MainFrame.derbyStatement != null)
+					        	MainFrame.derbyStatement.close();
+							if (MainFrame.derbyConnection != null)
+								MainFrame.derbyConnection.close();
 		                } catch (Exception e1) {
 		                    e1.printStackTrace();
 		                }
@@ -241,6 +247,10 @@ public class FileButton extends JButton{
 						MainFrame.bigAnimation = null;
 						MainFrame.bigCaseCollection = null;
 						MainFrame.bigVariantCollection = null;
+                        MainFrame.bigEventCollectionDerby = null;
+                        MainFrame.bigCaseCollectionDerby = null;
+                        MainFrame.bigVariantCollectionDerby = null;
+						MainFrame.bigAnimationDerby = null;
                         MainFrame.eventCollection = new EventCollection();
                         MainFrame.graphNet = new GraphNet();
                         MainFrame.variantCollection = new VariantCollection();

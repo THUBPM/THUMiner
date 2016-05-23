@@ -242,6 +242,12 @@ public class BigFileButton extends JButton{
 								MainFrame.oracleConnection.close();
 							if (MainFrame.mongoClient != null)
 								MainFrame.mongoClient.close();
+					        if (MainFrame.derbyResult != null)
+					        	MainFrame.derbyResult.close();
+					        if (MainFrame.derbyStatement != null)
+					        	MainFrame.derbyStatement.close();
+							if (MainFrame.derbyConnection != null)
+								MainFrame.derbyConnection.close();
 		                } catch (Exception e1) {
 		                    e1.printStackTrace();
 		                }

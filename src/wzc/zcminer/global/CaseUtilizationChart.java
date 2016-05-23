@@ -65,6 +65,13 @@ public class CaseUtilizationChart {
         data.get(i).addCaseCount();
     }
     
+    public void addCases(BigCaseDerby mycase) {
+        int i = (int) Math.floor(mycase.getActive(true) * 100);
+        if(i > 100)
+        	i = 100;
+        data.get(i).addCaseCount();
+    }
+    
     public int getSize(){
         return data.size();
     }
