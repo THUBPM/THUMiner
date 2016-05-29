@@ -55,7 +55,7 @@ public class BigVariantDerby {
 	public BigVariantDerby(int id) {
 		// TODO Auto-generated constructor stub
 		try {
-			String sql = "select * from variantCollection where variantID = " + id;
+			String sql = "select * from variantCollection where variantID = " + id + " OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
          	ResultSet derbyResult = derbyStatement.executeQuery();
 			
@@ -78,13 +78,19 @@ public class BigVariantDerby {
 		}
 	}
 	
-	public void insert() {
+	public void insert(PreparedStatement derbyStatement) {
 		try {
-			String sql = "insert into variantCollection values(" + variantID + ", " + totalDuration + ", " + medianDuration + ", "+ size + ", '" + String.join("\t", activities.toArray(new String[]{})) + "')";
-			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-         	derbyStatement.executeUpdate();
-	        if (derbyStatement != null)
-	        	derbyStatement.close();
+//			String sql = "insert into variantCollection values(" + variantID + ", " + totalDuration + ", " + medianDuration + ", "+ size + ", '" + String.join("\t", activities.toArray(new String[]{})) + "')";
+//			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//         	derbyStatement.executeUpdate();
+//	        if (derbyStatement != null)
+//	        	derbyStatement.close();
+			derbyStatement.setInt(1, variantID);
+			derbyStatement.setLong(2, totalDuration);
+			derbyStatement.setLong(3, medianDuration);
+			derbyStatement.setLong(4, size);
+			derbyStatement.setString(5, String.join("\t", activities.toArray(new String[]{})));
+			derbyStatement.addBatch();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -98,9 +104,9 @@ public class BigVariantDerby {
 		return variantID;
 	}
 
-	public void addCase(BigCaseDerby c) {
+	public void addCase(BigCaseDerby c, PreparedStatement caseDerbyStatement) {
 		c.setVariantID(variantID);
-		c.update();
+		c.update(caseDerbyStatement);
 	    totalDuration += c.getDuration();
 	    size++;
 	}
@@ -111,18 +117,14 @@ public class BigVariantDerby {
 	
 	public BigCaseDerby getCase(int pos) {		
 		try {
-			String sql = "select * from caseCollection where variantID = " + variantID;
+			String sql = "select * from caseCollection where variantID = " + variantID + " OFFSET " + pos + " ROWS FETCH NEXT 1 ROWS ONLY";
 			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-			derbyStatement.setMaxRows(pos + 2);
          	ResultSet derbyResult = derbyStatement.executeQuery();
          	BigCaseDerby c = null;
-         	int i = 0;
 
-            while (derbyResult.next())
+            if (derbyResult.next())
             {
-            	if (i == pos)
-            		c = new BigCaseDerby(derbyResult);
-            	i++;
+            	c = new BigCaseDerby(derbyResult);
             }
          	
 	        if (derbyResult != null)

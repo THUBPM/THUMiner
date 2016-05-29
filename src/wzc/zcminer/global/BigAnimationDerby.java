@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,15 +78,14 @@ public class BigAnimationDerby {
 	}
 	
 	public boolean exists(long frame) {
-		int count = 0;
 		try {			
-			String sql = "select count(*) as countResult from animation where frame = " + frame;
+			String sql = "select * from animation where frame = " + frame + " OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
          	ResultSet derbyResult = derbyStatement.executeQuery();
          	
             if (derbyResult.next())
             {
-            	count = derbyResult.getInt("countResult");
+            	return true;
             }
          	
 	        if (derbyResult != null)
@@ -95,7 +95,7 @@ public class BigAnimationDerby {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		return count > 0;
+		return false;
 	}
 	
 	public Frame newFrame() {
@@ -111,12 +111,13 @@ public class BigAnimationDerby {
 		public int[][] activityQueFre; //边的case频率
 		long frame;
 		long nextFrame;
+		boolean insert = false;
 		
 		public Frame() {
 			// TODO Auto-generated constructor stub
 			activityQueFre = new int[activityCount][activityCount];
 			activityFre = new int[activityCount];
-			
+			insert = true;
 			frame = -1;
 			nextFrame = -1;
 		}
@@ -124,7 +125,7 @@ public class BigAnimationDerby {
 		public Frame(long frame) {
 			// TODO Auto-generated constructor stub
 			try {
-				String sql = "select * from animation where frame = " + frame;
+				String sql = "select * from animation where frame = " + frame + " OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 				PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
 	         	ResultSet derbyResult = derbyStatement.executeQuery();
 	         	
@@ -189,7 +190,7 @@ public class BigAnimationDerby {
 			}
 		}
 		
-		public void insert(){
+		public void insert(Statement derbyStatement){
 			try {
 				String activityFreString = "" + activityFre[0];
 				for(int i = 1; i < activityCount; i++){
@@ -207,16 +208,17 @@ public class BigAnimationDerby {
 				}
 				
 				String sql = "insert into animation values(" + frame + ", " + nextFrame + ", '" + activityFreString + "', '" + activityQueFreString + "')";
-				PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-	         	derbyStatement.executeUpdate();
-		        if (derbyStatement != null)
-		        	derbyStatement.close();
+//				PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//	         	derbyStatement.executeUpdate();
+//		        if (derbyStatement != null)
+//		        	derbyStatement.close();
+				derbyStatement.addBatch(sql);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
 		
-		public void update(){
+		public void update(Statement derbyStatement){
 			try {
 				String activityFreString = "" + activityFre[0];
 				for(int i = 1; i < activityCount; i++){
@@ -234,10 +236,43 @@ public class BigAnimationDerby {
 				}
 				
 				String sql = "update animation set nextFrame = " + nextFrame + ", activityFre = '" + activityFreString + "', activityQueFre = '" + activityQueFreString + "' where frame = " + frame;
-				PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-	         	derbyStatement.executeUpdate();
-		        if (derbyStatement != null)
-		        	derbyStatement.close();
+//				PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//	         	derbyStatement.executeUpdate();
+//		        if (derbyStatement != null)
+//		        	derbyStatement.close();
+		        derbyStatement.addBatch(sql);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+		public void update(PreparedStatement derbyStatement){
+			try {
+				String activityFreString = "" + activityFre[0];
+				for(int i = 1; i < activityCount; i++){
+					activityFreString += "," + activityFre[i];
+				}
+				String activityQueFreString = "" + activityQueFre[0][0];
+				for(int j = 1; j < activityCount; j++){
+					activityQueFreString += "," + activityQueFre[0][j];
+				}
+				for(int i = 1; i < activityCount; i++){
+					activityQueFreString += ";" + activityQueFre[i][0];
+					for(int j = 1; j < activityCount; j++){
+						activityQueFreString += "," + activityQueFre[i][j];
+					}
+				}
+				
+//				String sql = "update animation set nextFrame = " + nextFrame + ", activityFre = '" + activityFreString + "', activityQueFre = '" + activityQueFreString + "' where frame = " + frame;
+//				PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//	         	derbyStatement.executeUpdate();
+//		        if (derbyStatement != null)
+//		        	derbyStatement.close();
+				derbyStatement.setLong(1, nextFrame);
+				derbyStatement.setString(2, activityFreString);
+				derbyStatement.setString(3, activityQueFreString);
+				derbyStatement.setLong(4, frame);
+				derbyStatement.addBatch();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -302,8 +337,11 @@ public class BigAnimationDerby {
 		}
 	}
 
-	public void addFrame(Frame c) {
-        c.insert();
+	public void addFrame(Frame c, Statement derbyStatement) {
+		if(c.insert)	
+			c.insert(derbyStatement);
+		else
+			c.update(derbyStatement);
 	    size++;
 	}
 	
@@ -373,37 +411,61 @@ public class BigAnimationDerby {
 	}
 	
 	public void merge(){
-    	animationFrame[0] = beginTime;
-    	
-        Frame frame = getFirst();
-        Frame nextFrame = getNext();
-        Frame nextNextFrame = null;
-        
-        if(nextFrame != null){
-        	frame.setNextFrame(nextFrame.getFrame());
-        	frame.update();
-        	nextNextFrame = getNext();
-        	
-            while (nextNextFrame != null) {
-            	animationFrame[((int) Math.ceil((nextFrame.getFrame() - beginTime) * 100 / (endTime - beginTime)))] = nextFrame.getFrame();
-            	nextFrame.addFrame(frame);
-            	nextFrame.setNextFrame(nextNextFrame.getFrame());
-            	nextFrame.update();
-            	
-            	frame = nextFrame;
-            	nextFrame = nextNextFrame;
-            	nextNextFrame = getNext();
-            }
-            
-        	animationFrame[((int) Math.ceil((nextFrame.getFrame() - beginTime) * 100 / (endTime - beginTime)))] = nextFrame.getFrame();
-        	nextFrame.addFrame(frame);
-        	nextFrame.update();
-        }
-        
-        for(int i = 1; i < 101; i++){
-        	if(animationFrame[i] == 0)
-        		animationFrame[i] = animationFrame[i - 1];
-        }
+		try{
+    		int icount = 0;
+    		long now;
+    		MainFrame.derbyConnection.setAutoCommit(false);
+    		String sql = "update animation set nextFrame = ?, activityFre = ?, activityQueFre = ? where frame = ?";
+			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+			
+	    	animationFrame[0] = beginTime;
+	    	
+	        Frame frame = getFirst();
+	        Frame nextFrame = getNext();
+	        Frame nextNextFrame = null;
+	        
+	        if(nextFrame != null){
+	        	frame.setNextFrame(nextFrame.getFrame());
+	        	frame.update(derbyStatement);
+	        	nextNextFrame = getNext();
+	        	
+	            while (nextNextFrame != null) {
+	            	icount++;
+					if(icount % 10000 == 0){
+						derbyStatement.executeBatch();
+						MainFrame.derbyConnection.commit();
+						derbyStatement.clearBatch();
+						now=System.currentTimeMillis();
+						System.out.println("animationMerge"+(icount) +"："+(now)+"毫秒");
+					}
+	            	animationFrame[((int) Math.ceil((nextFrame.getFrame() - beginTime) * 100 / (endTime - beginTime)))] = nextFrame.getFrame();
+	            	nextFrame.addFrame(frame);
+	            	nextFrame.setNextFrame(nextNextFrame.getFrame());
+	            	nextFrame.update(derbyStatement);
+	            	
+	            	frame = nextFrame;
+	            	nextFrame = nextNextFrame;
+	            	nextNextFrame = getNext();
+	            }
+	            
+	        	animationFrame[((int) Math.ceil((nextFrame.getFrame() - beginTime) * 100 / (endTime - beginTime)))] = nextFrame.getFrame();
+	        	nextFrame.addFrame(frame);
+	        	nextFrame.update(derbyStatement);
+	        }
+	        
+	        for(int i = 1; i < 101; i++){
+	        	if(animationFrame[i] == 0)
+	        		animationFrame[i] = animationFrame[i - 1];
+	        }
+	        
+			derbyStatement.executeBatch();
+			MainFrame.derbyConnection.commit();
+	        if (derbyStatement != null)
+	        	derbyStatement.close();
+    		MainFrame.derbyConnection.setAutoCommit(true);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public Frame getAnimationFrame(int i){

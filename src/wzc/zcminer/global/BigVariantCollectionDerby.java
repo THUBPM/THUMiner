@@ -1,5 +1,6 @@
 package wzc.zcminer.global;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,8 +14,8 @@ public class BigVariantCollectionDerby {
 		count = 0;
 	}
 
-	public void addVariant(BigVariantDerby c) {
-	    c.insert();
+	public void addVariant(BigVariantDerby c, PreparedStatement derbyStatement) {
+	    c.insert(derbyStatement);
 	    count++;
 	}
 	

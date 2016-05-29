@@ -735,36 +735,31 @@ public class BigStaticsPanelDerby extends JPanel implements ComponentListener {
                  	int i = 0;
                     
             		try {
-            			String sql = "select * from caseCollection";
+            			String sql = "select * from caseCollection" + " OFFSET " + ((pageSelectedValue) * 1000) + " ROWS FETCH NEXT 1000 ROWS ONLY";
             			derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-            			derbyStatement.setMaxRows((pageSelectedValue + 1) * 1000 + 1);
                      	derbyResult = derbyStatement.executeQuery();
 
                         while (derbyResult.next())
                         {
-                        	if (i >= pageSelectedValue * 1000 && i < (pageSelectedValue + 1) * 1000) {
-                                BigCaseDerby mycase = new BigCaseDerby(derbyResult);
-                                tableData[i % 1000][0] = mycase.getCase();
-                                tableData[i % 1000][1] = mycase.getSize() + "";
-                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                tableData[i % 1000][2] = formatter.format(mycase.getStart());
-                                tableData[i % 1000][3] = formatter.format(mycase.getEnd());
-                                long diff = mycase.getDuration();
-                                long diffMinutes = diff / (60 * 1000) % 60;
-                                long diffHours = diff / (60 * 60 * 1000) % 24;
-                                long diffDays = diff / (24 * 60 * 60 * 1000);
-                        		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-                        		{
-                                    tableData[i % 1000][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
-                                }
-                        		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-                        		{
-                                    tableData[i % 1000][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
-                        	 	}
-                        	} else if(i >= (pageSelectedValue + 1) * 1000) {
-                        		break;
-                        	}
-                        	i++;
+                            BigCaseDerby mycase = new BigCaseDerby(derbyResult);
+                            tableData[i][0] = mycase.getCase();
+                            tableData[i][1] = mycase.getSize() + "";
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            tableData[i][2] = formatter.format(mycase.getStart());
+                            tableData[i][3] = formatter.format(mycase.getEnd());
+                            long diff = mycase.getDuration();
+                            long diffMinutes = diff / (60 * 1000) % 60;
+                            long diffHours = diff / (60 * 60 * 1000) % 24;
+                            long diffDays = diff / (24 * 60 * 60 * 1000);
+                    		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+                    		{
+                                tableData[i][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
+                            }
+                    		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+                    		{
+                                tableData[i][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
+                    	 	}
+                    		i++;
                         }
                         
             	        if (derbyResult != null)
@@ -797,35 +792,30 @@ public class BigStaticsPanelDerby extends JPanel implements ComponentListener {
      	int i = 0;
         
 		try {
-			String sql = "select * from caseCollection";
+			String sql = "select * from caseCollection" + " OFFSET " + ((pageSelectedValue) * 1000) + " ROWS FETCH NEXT 1000 ROWS ONLY";
 			derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-			derbyStatement.setMaxRows((pageSelectedValue + 1) * 1000 + 1);
          	derbyResult = derbyStatement.executeQuery();
 
             while (derbyResult.next())
             {
-            	if (i >= pageSelectedValue * 1000 && i < (pageSelectedValue + 1) * 1000) {
-                    BigCaseDerby mycase = new BigCaseDerby(derbyResult);
-                    tableData[i % 1000][0] = mycase.getCase();
-                    tableData[i % 1000][1] = mycase.getSize() + "";
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    tableData[i % 1000][2] = formatter.format(mycase.getStart());
-                    tableData[i % 1000][3] = formatter.format(mycase.getEnd());
-                    long diff = mycase.getDuration();
-                    long diffMinutes = diff / (60 * 1000) % 60;
-                    long diffHours = diff / (60 * 60 * 1000) % 24;
-                    long diffDays = diff / (24 * 60 * 60 * 1000);
-            		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-            		{
-                        tableData[i % 1000][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
-                    }
-            		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-            		{
-                        tableData[i % 1000][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
-            	 	}
-            	} else if(i >= (pageSelectedValue + 1) * 1000) {
-            		break;
-            	}
+            	BigCaseDerby mycase = new BigCaseDerby(derbyResult);
+                tableData[i][0] = mycase.getCase();
+                tableData[i][1] = mycase.getSize() + "";
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                tableData[i][2] = formatter.format(mycase.getStart());
+                tableData[i][3] = formatter.format(mycase.getEnd());
+                long diff = mycase.getDuration();
+                long diffMinutes = diff / (60 * 1000) % 60;
+                long diffHours = diff / (60 * 60 * 1000) % 24;
+                long diffDays = diff / (24 * 60 * 60 * 1000);
+        		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+        		{
+                    tableData[i][4] = diffDays + " days " + diffHours + " hours " + diffMinutes + " mins";
+                }
+        		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+        		{
+                    tableData[i][4] = diffDays + "天" + diffHours + "小时" + diffMinutes + "分";
+        	 	}
             	i++;
             }
             

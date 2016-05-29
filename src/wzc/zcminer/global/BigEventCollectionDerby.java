@@ -21,14 +21,11 @@ public class BigEventCollectionDerby {
 		size = 0;
 	}
 
-	public void addEvent(BigEventDerby c) {
-//		long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
+	public void addEvent(BigEventDerby c, PreparedStatement derbyStatement) {
 		String uuid = UUID.randomUUID().toString();
 		c.setUUID(uuid);
-		c.insert();
+		c.insert(derbyStatement);
 	    size++;
-//		long endMili=System.currentTimeMillis();
-//		System.out.println("add " + c.getCase() + " 总耗时为："+(endMili-startMili)+"毫秒");
 	}
 	
 	public int getSize(){

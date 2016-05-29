@@ -61,7 +61,7 @@ public class BigCaseDerby {
 	public BigCaseDerby(String id) {
 		// TODO Auto-generated constructor stub
 		try {
-			String sql = "select * from caseCollection where caseID = '" + id + "'";
+			String sql = "select * from caseCollection where caseID = '" + id + "'" + " OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
          	ResultSet derbyResult = derbyStatement.executeQuery();
 			
@@ -87,25 +87,37 @@ public class BigCaseDerby {
 		}
 	}
 	
-	public void insert(){
+	public void insert(PreparedStatement derbyStatement){
 		try {
-			String sql = "insert into caseCollection values('" + caseID + "', " + events + ", " + start.getTime() + ", "+ end.getTime() + ", " + duration + ", " + active + ", '" + String.join("\t", activities.toArray(new String[]{})) + "', '" + String.join("\t", eventList.toArray(new String[]{})) + "', 0)";
-			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-         	derbyStatement.executeUpdate();
-	        if (derbyStatement != null)
-	        	derbyStatement.close();
+//			String sql = "insert into caseCollection values('" + caseID + "', " + events + ", " + start.getTime() + ", "+ end.getTime() + ", " + duration + ", " + active + ", '" + String.join("\t", activities.toArray(new String[]{})) + "', '" + String.join("\t", eventList.toArray(new String[]{})) + "', 0)";
+//			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//         	derbyStatement.executeUpdate();
+//	        if (derbyStatement != null)
+//	        	derbyStatement.close();
+			derbyStatement.setString(1, caseID);
+			derbyStatement.setLong(2, events);
+			derbyStatement.setLong(3, start.getTime());
+			derbyStatement.setLong(4, end.getTime());
+			derbyStatement.setLong(5, duration);
+			derbyStatement.setLong(6, active);
+			derbyStatement.setString(7, String.join("\t", activities.toArray(new String[]{})));
+			derbyStatement.setString(8, String.join("\t", eventList.toArray(new String[]{}))); 
+			derbyStatement.addBatch();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 	
-	public void update(){
+	public void update(PreparedStatement derbyStatement){
 		try {
-			String sql = "update caseCollection set variantID = " + variantID + " where caseID = '" + caseID + "'";
-			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-         	derbyStatement.executeUpdate();
-	        if (derbyStatement != null)
-	        	derbyStatement.close();
+//			String sql = "update caseCollection set variantID = " + variantID + " where caseID = '" + caseID + "'";
+//			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//         	derbyStatement.executeUpdate();
+//	        if (derbyStatement != null)
+//	        	derbyStatement.close();
+			derbyStatement.setInt(1, variantID);
+			derbyStatement.setString(2, caseID);
+			derbyStatement.addBatch();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

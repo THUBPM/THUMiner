@@ -61,7 +61,7 @@ public class BigEventDerby {
 	
 	public BigEventDerby(String uuid) {
 		try {
-			String sql = "select * from eventCollection where UUID = '" + uuid + "'";
+			String sql = "select * from eventCollection where UUID = '" + uuid + "'" + " OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
          	ResultSet derbyResult = derbyStatement.executeQuery();
 			
@@ -86,13 +86,20 @@ public class BigEventDerby {
 		}
 	}
 	
-	public void insert(){
+	public void insert(PreparedStatement derbyStatement){
 		try {
-			String sql = "insert into eventCollection values('" + uuid + "', '" + caseID + "', '" + activity + "', '" + resource + "', " + startDate.getTime() + ", "+ endDate.getTime() + ", false, false)";
-			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-         	derbyStatement.executeUpdate();
-	        if (derbyStatement != null)
-	        	derbyStatement.close();
+//			String sql = "insert into eventCollection values('" + uuid + "', '" + caseID + "', '" + activity + "', '" + resource + "', " + startDate.getTime() + ", "+ endDate.getTime() + ", false, false)";
+//			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//         	derbyStatement.executeUpdate();
+//	        if (derbyStatement != null)
+//	        	derbyStatement.close();
+			derbyStatement.setString(1, uuid);
+			derbyStatement.setString(2, caseID);
+			derbyStatement.setString(3, activity);
+			derbyStatement.setString(4, resource);
+			derbyStatement.setLong(5, startDate.getTime());
+			derbyStatement.setLong(6, endDate.getTime());
+			derbyStatement.addBatch();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -106,27 +113,31 @@ public class BigEventDerby {
         return uuid;
     }
     
-    public void setFirst() {
+    public void setFirst(PreparedStatement derbyStatement) {
         first = true;
 		try {
-			String sql = "update eventCollection set firstInCase = true where UUID = '" + uuid + "'";
-			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-         	derbyStatement.executeUpdate();
-	        if (derbyStatement != null)
-	        	derbyStatement.close();
+//			String sql = "update eventCollection set firstInCase = true where UUID = '" + uuid + "'";
+//			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//         	derbyStatement.executeUpdate();
+//	        if (derbyStatement != null)
+//	        	derbyStatement.close();
+			derbyStatement.setString(1, uuid);
+			derbyStatement.addBatch();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
     }
     
-    public void setLast() {
+    public void setLast(PreparedStatement derbyStatement) {
         last = true;
 		try {
-			String sql = "update eventCollection set lastInCase = true where UUID = '" + uuid + "'";
-			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-         	derbyStatement.executeUpdate();
-	        if (derbyStatement != null)
-	        	derbyStatement.close();
+//			String sql = "update eventCollection set lastInCase = true where UUID = '" + uuid + "'";
+//			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+//         	derbyStatement.executeUpdate();
+//	        if (derbyStatement != null)
+//	        	derbyStatement.close();
+			derbyStatement.setString(1, uuid);
+			derbyStatement.addBatch();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

@@ -175,30 +175,23 @@ public class BigCasesPanelDerby extends JPanel implements ComponentListener {
     	                int pageSelectedValue = caseComboBox.getSelectedIndex();
                         PreparedStatement derbyStatement = null;
                         ResultSet derbyResult = null;
-                     	int i = 0;
                         
                 		try {
-                			String sql = "select * from caseCollection";
+                			String sql = "select * from caseCollection" + " OFFSET " + ((pageSelectedValue) * 1000) + " ROWS FETCH NEXT 1000 ROWS ONLY";
                 			derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-                			derbyStatement.setMaxRows((pageSelectedValue + 1) * 1000 + 1);
                          	derbyResult = derbyStatement.executeQuery();
 
                             while (derbyResult.next())
                             {
-                            	if (i >= pageSelectedValue * 1000 && i < (pageSelectedValue + 1) * 1000) {
-                                    BigCaseDerby mycase = new BigCaseDerby(derbyResult);
-            	        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-            	        			{
-                	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
-            	        			}
-            	        			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-            	        			{
-                	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
-                	        		}
-                            	} else if(i >= (pageSelectedValue + 1) * 1000) {
-                            		break;
-                            	}
-                            	i++;
+                                BigCaseDerby mycase = new BigCaseDerby(derbyResult);
+        	        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+        	        			{
+            	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
+        	        			}
+        	        			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+        	        			{
+            	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
+            	        		}
                             }
                             
                 	        if (derbyResult != null)
@@ -274,30 +267,24 @@ public class BigCasesPanelDerby extends JPanel implements ComponentListener {
         int pageSelectedValue = caseComboBox.getSelectedIndex();
         PreparedStatement derbyStatement = null;
         ResultSet derbyResult = null;
-     	int i = 0;
         
 		try {
-			String sql = "select * from caseCollection";
+			String sql = "select * from caseCollection" + " OFFSET " + ((pageSelectedValue) * 1000) + " ROWS FETCH NEXT 1000 ROWS ONLY";
 			derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
 			derbyStatement.setMaxRows((pageSelectedValue + 1) * 1000 + 1);
          	derbyResult = derbyStatement.executeQuery();
 
             while (derbyResult.next())
             {
-            	if (i >= pageSelectedValue * 1000 && i < (pageSelectedValue + 1) * 1000) {
-                    BigCaseDerby mycase = new BigCaseDerby(derbyResult);
-        			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-        			{
-	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
-        			}
-        			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-        			{
-	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
-	        		}
-            	} else if(i >= (pageSelectedValue + 1) * 1000) {
-            		break;
-            	}
-            	i++;
+                BigCaseDerby mycase = new BigCaseDerby(derbyResult);
+    			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+    			{
+        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
+    			}
+    			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+    			{
+        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
+        		}
             }
             
 	        if (derbyResult != null)
@@ -345,30 +332,23 @@ public class BigCasesPanelDerby extends JPanel implements ComponentListener {
     	                int pageSelectedValue = caseComboBox.getSelectedIndex();
     	                PreparedStatement derbyStatement = null;
     	                ResultSet derbyResult = null;
-    	             	int i = 0;
     	                
     	        		try {
-    	        			String sql = "select * from caseCollection";
+    	        			String sql = "select * from caseCollection" + " OFFSET " + ((pageSelectedValue) * 1000) + " ROWS FETCH NEXT 1000 ROWS ONLY";
     	        			derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-    	        			derbyStatement.setMaxRows((pageSelectedValue + 1) * 1000 + 1);
     	                 	derbyResult = derbyStatement.executeQuery();
 
     	                    while (derbyResult.next())
     	                    {
-    	                    	if (i >= pageSelectedValue * 1000 && i < (pageSelectedValue + 1) * 1000) {
-    	                            BigCaseDerby mycase = new BigCaseDerby(derbyResult);
-    	                			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-    	                			{
-    	        	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
-    	                			}
-    	                			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-    	                			{
-    	        	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
-    	        	        		}
-    	                    	} else if(i >= (pageSelectedValue + 1) * 1000) {
-    	                    		break;
-    	                    	}
-    	                    	i++;
+	                            BigCaseDerby mycase = new BigCaseDerby(derbyResult);
+	                			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+	                			{
+	        	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + " events)");
+	                			}
+	                			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+	                			{
+	        	        			casesListModel.addElement(mycase.getCase() + " (" + mycase.getSize() + "事件)");
+	        	        		}
     	                    }
     	                    
     	        	        if (derbyResult != null)
@@ -529,21 +509,15 @@ public class BigCasesPanelDerby extends JPanel implements ComponentListener {
             BigCaseDerby mycase = null;
             PreparedStatement derbyStatement = null;
             ResultSet derbyResult = null;
-         	int i = 0;
             
     		try {
-    			String sql = "select * from caseCollection";
+    			String sql = "select * from caseCollection" + " OFFSET " + (pageSelectedValue * 1000 + caseSelectedValue) + " ROWS FETCH NEXT 1 ROWS ONLY";
     			derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
-    			derbyStatement.setMaxRows((pageSelectedValue + 1) * 1000 + 1);
              	derbyResult = derbyStatement.executeQuery();
 
-                while (derbyResult.next())
+                if (derbyResult.next())
                 {
-                	if (i == pageSelectedValue * 1000 + caseSelectedValue) {
-                        mycase = new BigCaseDerby(derbyResult);
-            			break;
-                	}
-                	i++;
+                	 mycase = new BigCaseDerby(derbyResult);
                 }
                 
     	        if (derbyResult != null)

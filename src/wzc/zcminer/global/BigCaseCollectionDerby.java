@@ -27,8 +27,8 @@ public class BigCaseCollectionDerby {
 	    size = 0;
 	}
 	
-	public void addCase(BigCaseDerby c) {
-		c.insert();
+	public void addCase(BigCaseDerby c, PreparedStatement derbyStatement) {
+		c.insert(derbyStatement);
         
 	    size++;
         totalDuration += c.getDuration();

@@ -21,10 +21,15 @@ import java.io.InputStreamReader;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -470,20 +475,50 @@ public class BigImportPanelDerby extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				long start=System.currentTimeMillis();// 当前时间对应的毫秒数
 				
+				long now=System.currentTimeMillis();
+				System.out.println("now："+(now)+"毫秒");
 			    setEventCollection(fileName, separator, hasTableHead, encodingText);
+			    now=System.currentTimeMillis();
+				System.out.println("eventCollection："+(now)+"毫秒");
 			    setGraphNet();
+			    now=System.currentTimeMillis();
+				System.out.println("GraphNet"+(now)+"毫秒");
 			    setAnimation();
+			    now=System.currentTimeMillis();
+				System.out.println("Animation"+(now)+"毫秒");
 			    setCaseCollection();
+			    now=System.currentTimeMillis();
+				System.out.println("caseCollection："+(now)+"毫秒");
 			    setVariantCollection();
+			    now=System.currentTimeMillis();
+				System.out.println("variantCollection："+(now)+"毫秒");
 			    setEventsOverTimeChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setEventsOverTimeChart："+(now)+"毫秒");
 			    setActiveCasesOverTimeChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setActiveCasesOverTimeChart："+(now)+"毫秒");
 			    setEventsPerCaseChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setEventsPerCaseChart："+(now)+"毫秒");
 			    setCaseDurationChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setCaseDurationChart："+(now)+"毫秒");
 			    setCaseUtilizationChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setCaseUtilizationChart："+(now)+"毫秒");
 			    setMeanActivityDurationChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setMeanActivityDurationChart："+(now)+"毫秒");
 			    setMeanWaitingTimeChart();
+			    now=System.currentTimeMillis();
+				System.out.println("setMeanWaitingTimeChart："+(now)+"毫秒");
 			    setActivityCollection();
+			    now=System.currentTimeMillis();
+				System.out.println("setActivityCollection："+(now)+"毫秒");
 			    setResourceCollection();
+			    now=System.currentTimeMillis();
+				System.out.println("setResourceCollection："+(now)+"毫秒");
 				
 				MainFrame.mainFrame.getContentPane().removeAll();
 				System.gc();
@@ -525,6 +560,11 @@ public class BigImportPanelDerby extends JPanel{
 	//更新event集
     public void setEventCollection(String fileName, String separator, boolean hasTableHead, String encodingText) {
     	try {
+    		int icount = 0;
+    		long now;
+    		MainFrame.derbyConnection.setAutoCommit(false);
+    		String sql = "insert into eventCollection values(?, ?, ?, ?, ?, ?, false, false)";
+			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
 			File file = new File(fileName);
 			InputStreamReader read = null;
 			BufferedReader reader = null;
@@ -541,6 +581,14 @@ public class BigImportPanelDerby extends JPanel{
 				String[] tempStringList;
 				while((tempString = reader.readLine()) != null)
 				{
+					icount++;
+					if(icount % 10000 == 0){
+						derbyStatement.executeBatch();
+						MainFrame.derbyConnection.commit();
+						derbyStatement.clearBatch();
+						now=System.currentTimeMillis();
+						System.out.println("eventCollection"+(icount) +"："+(now)+"毫秒");
+					}
 					tempStringList = tempString.split(separator);
 					BigEventDerby event = new BigEventDerby();
 					for (int j = 0; j < headIndex.length; j++) {
@@ -571,7 +619,7 @@ public class BigImportPanelDerby extends JPanel{
 		                    break;
 		                }
 		            }
-					MainFrame.bigEventCollectionDerby.addEvent(event);
+					MainFrame.bigEventCollectionDerby.addEvent(event, derbyStatement);
 				}
 				reader.close();
 				read.close();
@@ -589,6 +637,11 @@ public class BigImportPanelDerby extends JPanel{
 					}
 				}
 			}
+			derbyStatement.executeBatch();
+			MainFrame.derbyConnection.commit();
+	        if (derbyStatement != null)
+	        	derbyStatement.close();
+    		MainFrame.derbyConnection.setAutoCommit(true);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -596,6 +649,8 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新graph
     public void setGraphNet() {
+		int icount = 0;
+		long now;
         MainFrame.graphNet.setMemory();
 		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
 		{
@@ -615,6 +670,11 @@ public class BigImportPanelDerby extends JPanel{
         //按顺序遍历得出case，并运算各个参数
         BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstEventID();
         while (event != null) {
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setGraphNet"+(icount) +"："+(now)+"毫秒");
+			}
             String activityName = event.getActivity();
             String caseName = event.getCase();
             long time = event.getTime();
@@ -703,167 +763,301 @@ public class BigImportPanelDerby extends JPanel{
     }
   
     public void setAnimation() {
-        MainFrame.bigAnimationDerby.setMemory();
-		if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
-		{
-	        MainFrame.bigAnimationDerby.activityNames[0] = "begin";
-	        MainFrame.bigAnimationDerby.activityNames[1] = "end";
+    	int icount = 0;
+		long now;
+		try{
+			MainFrame.derbyConnection.setAutoCommit(false);
+			Statement derbyStatement = MainFrame.derbyConnection.createStatement();
+			HashMap<Long, Frame> hashMap = new HashMap<Long, Frame>();;
+	        MainFrame.bigAnimationDerby.setMemory();
+			if(MainFrame.properties.getProperty("language", "zhCN").equals("enUS"))
+			{
+		        MainFrame.bigAnimationDerby.activityNames[0] = "begin";
+		        MainFrame.bigAnimationDerby.activityNames[1] = "end";
+			}
+			else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
+			{
+		        MainFrame.bigAnimationDerby.activityNames[0] = "开始";
+		        MainFrame.bigAnimationDerby.activityNames[1] = "结束";
+		    }
+	        int lastActivityId = -1;
+	        Frame newFrame = null;
+	        //按顺序遍历得出case，并运算各个参数
+	        BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstEventID();
+	        BigEventDerby nextEvent = null;
+	        while (event != null) {
+				icount++;
+				if(icount % 1000 == 0){
+					Iterator<Entry<Long, Frame>>  iter = hashMap.entrySet().iterator();
+					while (iter.hasNext()) {
+						Entry<Long, Frame> entry = (Entry<Long, Frame>) iter.next();
+						long key = entry.getKey();
+						Frame val = entry.getValue();
+						if(key != val.getFrame())
+							System.out.println(key);
+						MainFrame.bigAnimationDerby.addFrame(val, derbyStatement);
+					}
+					derbyStatement.executeBatch();
+					MainFrame.derbyConnection.commit();
+					derbyStatement.clearBatch();
+					hashMap.clear();
+					now=System.currentTimeMillis();
+					System.out.println("setAnimation"+(icount) +"："+(now)+"毫秒");
+				}
+	            String activityName = event.getActivity();
+	            int activityId = MainFrame.bigAnimationDerby.getActivityId(activityName);
+	            MainFrame.bigAnimationDerby.setActivityName(activityId, activityName);
+	            MainFrame.bigAnimationDerby.setBeginTime(event.getStartDate().getTime());
+	            MainFrame.bigAnimationDerby.setEndTime(event.getEndDate().getTime());
+	            
+	        	if(lastActivityId == -1){
+	        		newFrame = MainFrame.bigAnimationDerby.newFrame();
+	        		newFrame.setFrame(event.getStartDate().getTime());
+	            	newFrame.incActivityFre(activityId);
+	            	hashMap.put(event.getStartDate().getTime(), newFrame);
+	        		//MainFrame.bigAnimationDerby.addFrame(newFrame);
+	        		lastActivityId = 0;
+	        	}
+	            
+	        	nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
+	        	
+	        	if(nextEvent == null){
+	        		if(hashMap.containsKey(event.getEndDate().getTime())){
+	        			newFrame = hashMap.get(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	        		}else if(MainFrame.bigAnimationDerby.exists(event.getEndDate().getTime())){
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	hashMap.put(event.getEndDate().getTime(), newFrame);
+	//                	newFrame.update();
+	            	}else{
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame();
+	            		newFrame.setFrame(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	hashMap.put(event.getEndDate().getTime(), newFrame);
+	//            		MainFrame.bigAnimationDerby.addFrame(newFrame);
+	            	}
+	            	break;
+	        	}
+	        	
+	            String nextActivityName = nextEvent.getActivity();
+	            int nextActivityId = MainFrame.bigAnimationDerby.getActivityId(nextActivityName);
+	            MainFrame.bigAnimationDerby.setActivityName(nextActivityId, nextActivityName);
+	            MainFrame.bigAnimationDerby.setBeginTime(nextEvent.getStartDate().getTime());
+	            MainFrame.bigAnimationDerby.setEndTime(nextEvent.getEndDate().getTime());
+	        	
+	        	if(nextEvent.getCase().equals(event.getCase())){
+	        		if(hashMap.containsKey(event.getEndDate().getTime())){
+	        			newFrame = hashMap.get(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	newFrame.incActivityQueFre(activityId, nextActivityId);
+	        		}else if(MainFrame.bigAnimationDerby.exists(event.getEndDate().getTime())){
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	newFrame.incActivityQueFre(activityId, nextActivityId);
+	                	hashMap.put(event.getEndDate().getTime(), newFrame);
+	//                	newFrame.update();
+	            	}else{
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame();
+	            		newFrame.setFrame(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	newFrame.incActivityQueFre(activityId, nextActivityId);
+	                	hashMap.put(event.getEndDate().getTime(), newFrame);
+	//            		MainFrame.bigAnimationDerby.addFrame(newFrame);
+	            	}
+	            	
+	        		if(hashMap.containsKey(nextEvent.getStartDate().getTime())){
+	        			newFrame = hashMap.get(nextEvent.getStartDate().getTime());
+	                	newFrame.incActivityFre(nextActivityId);
+	                	newFrame.decActivityQueFre(activityId, nextActivityId);
+	        		}else if(MainFrame.bigAnimationDerby.exists(nextEvent.getStartDate().getTime())){
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame(nextEvent.getStartDate().getTime());
+	                	newFrame.incActivityFre(nextActivityId);
+	                	newFrame.decActivityQueFre(activityId, nextActivityId);
+	                	hashMap.put(nextEvent.getStartDate().getTime(), newFrame);
+	//                	newFrame.update();
+	            	}else{
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame();
+	            		newFrame.setFrame(nextEvent.getStartDate().getTime());
+	                	newFrame.incActivityFre(nextActivityId);
+	                	newFrame.decActivityQueFre(activityId, nextActivityId);
+	                	hashMap.put(nextEvent.getStartDate().getTime(), newFrame);
+	//            		MainFrame.bigAnimationDerby.addFrame(newFrame);
+	            	}
+	        	}else{
+	        		if(hashMap.containsKey(event.getEndDate().getTime())){
+	        			newFrame = hashMap.get(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	        		}else if(MainFrame.bigAnimationDerby.exists(event.getEndDate().getTime())){
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	hashMap.put(event.getEndDate().getTime(), newFrame);
+	//                	newFrame.update();
+	            	}else{
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame();
+	            		newFrame.setFrame(event.getEndDate().getTime());
+	                	newFrame.decActivityFre(activityId);
+	                	hashMap.put(event.getEndDate().getTime(), newFrame);
+	//            		MainFrame.bigAnimationDerby.addFrame(newFrame);
+	            	}
+	            	
+	        		if(hashMap.containsKey(nextEvent.getStartDate().getTime())){
+	        			newFrame = hashMap.get(nextEvent.getStartDate().getTime());
+	                	newFrame.incActivityFre(nextActivityId);
+	        		}else if(MainFrame.bigAnimationDerby.exists(nextEvent.getStartDate().getTime())){
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame(nextEvent.getStartDate().getTime());
+	                	newFrame.incActivityFre(nextActivityId);
+	                	hashMap.put(nextEvent.getStartDate().getTime(), newFrame);
+	//                	newFrame.update();
+	            	}else{
+	            		newFrame = MainFrame.bigAnimationDerby.newFrame();
+	            		newFrame.setFrame(nextEvent.getStartDate().getTime());
+	                	newFrame.incActivityFre(nextActivityId);
+	                	hashMap.put(nextEvent.getStartDate().getTime(), newFrame);
+	//            		MainFrame.bigAnimationDerby.addFrame(newFrame);
+	            	}
+	        	}
+	    		
+		        event = nextEvent;
+		    }
+			Iterator<Entry<Long, Frame>>  iter = hashMap.entrySet().iterator();
+			while (iter.hasNext()) {
+				Entry<Long, Frame> entry = (Entry<Long, Frame>) iter.next();
+//				long key = entry.getKey();
+				Frame val = entry.getValue();
+				MainFrame.bigAnimationDerby.addFrame(val, derbyStatement);
+			}
+			derbyStatement.executeBatch();
+			MainFrame.derbyConnection.commit();
+			hashMap.clear();
+	        if (derbyStatement != null)
+	        	derbyStatement.close();
+    		MainFrame.derbyConnection.setAutoCommit(true);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		else if(MainFrame.properties.getProperty("language", "zhCN").equals("zhCN"))
-		{
-	        MainFrame.bigAnimationDerby.activityNames[0] = "开始";
-	        MainFrame.bigAnimationDerby.activityNames[1] = "结束";
-	    }
-        int lastActivityId = -1;
-        Frame newFrame = null;
-        //按顺序遍历得出case，并运算各个参数
-        BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstEventID();
-        BigEventDerby nextEvent = null;
-        while (event != null) {
-            String activityName = event.getActivity();
-            int activityId = MainFrame.bigAnimationDerby.getActivityId(activityName);
-            MainFrame.bigAnimationDerby.setActivityName(activityId, activityName);
-            MainFrame.bigAnimationDerby.setBeginTime(event.getStartDate().getTime());
-            MainFrame.bigAnimationDerby.setEndTime(event.getEndDate().getTime());
-            
-        	if(lastActivityId == -1){
-        		newFrame = MainFrame.bigAnimationDerby.newFrame();
-        		newFrame.setFrame(event.getStartDate().getTime());
-            	newFrame.incActivityFre(activityId);
-        		MainFrame.bigAnimationDerby.addFrame(newFrame);
-        		lastActivityId = 0;
-        	}
-            
-        	nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
-        	
-        	if(nextEvent == null){
-            	if(MainFrame.bigAnimationDerby.exists(event.getEndDate().getTime())){
-            		newFrame = MainFrame.bigAnimationDerby.newFrame(event.getEndDate().getTime());
-                	newFrame.decActivityFre(activityId);
-                	newFrame.update();
-            	}else{
-            		newFrame = MainFrame.bigAnimationDerby.newFrame();
-            		newFrame.setFrame(event.getEndDate().getTime());
-                	newFrame.decActivityFre(activityId);
-            		MainFrame.bigAnimationDerby.addFrame(newFrame);
-            	}
-            	break;
-        	}
-        	
-            String nextActivityName = nextEvent.getActivity();
-            int nextActivityId = MainFrame.bigAnimationDerby.getActivityId(nextActivityName);
-            MainFrame.bigAnimationDerby.setActivityName(nextActivityId, nextActivityName);
-            MainFrame.bigAnimationDerby.setBeginTime(nextEvent.getStartDate().getTime());
-            MainFrame.bigAnimationDerby.setEndTime(nextEvent.getEndDate().getTime());
-        	
-        	if(nextEvent.getCase().equals(event.getCase())){
-            	if(MainFrame.bigAnimationDerby.exists(event.getEndDate().getTime())){
-            		newFrame = MainFrame.bigAnimationDerby.newFrame(event.getEndDate().getTime());
-                	newFrame.decActivityFre(activityId);
-                	newFrame.incActivityQueFre(activityId, nextActivityId);
-                	newFrame.update();
-            	}else{
-            		newFrame = MainFrame.bigAnimationDerby.newFrame();
-            		newFrame.setFrame(event.getEndDate().getTime());
-                	newFrame.decActivityFre(activityId);
-                	newFrame.incActivityQueFre(activityId, nextActivityId);
-            		MainFrame.bigAnimationDerby.addFrame(newFrame);
-            	}
-            	
-            	if(MainFrame.bigAnimationDerby.exists(nextEvent.getStartDate().getTime())){
-            		newFrame = MainFrame.bigAnimationDerby.newFrame(nextEvent.getStartDate().getTime());
-                	newFrame.incActivityFre(nextActivityId);
-                	newFrame.decActivityQueFre(activityId, nextActivityId);
-                	newFrame.update();
-            	}else{
-            		newFrame = MainFrame.bigAnimationDerby.newFrame();
-            		newFrame.setFrame(nextEvent.getStartDate().getTime());
-                	newFrame.incActivityFre(nextActivityId);
-                	newFrame.decActivityQueFre(activityId, nextActivityId);
-            		MainFrame.bigAnimationDerby.addFrame(newFrame);
-            	}
-        	}else{
-            	if(MainFrame.bigAnimationDerby.exists(event.getEndDate().getTime())){
-            		newFrame = MainFrame.bigAnimationDerby.newFrame(event.getEndDate().getTime());
-                	newFrame.decActivityFre(activityId);
-                	newFrame.update();
-            	}else{
-            		newFrame = MainFrame.bigAnimationDerby.newFrame();
-            		newFrame.setFrame(event.getEndDate().getTime());
-                	newFrame.decActivityFre(activityId);
-            		MainFrame.bigAnimationDerby.addFrame(newFrame);
-            	}
-            	
-            	if(MainFrame.bigAnimationDerby.exists(nextEvent.getStartDate().getTime())){
-            		newFrame = MainFrame.bigAnimationDerby.newFrame(nextEvent.getStartDate().getTime());
-                	newFrame.incActivityFre(nextActivityId);
-                	newFrame.update();
-            	}else{
-            		newFrame = MainFrame.bigAnimationDerby.newFrame();
-            		newFrame.setFrame(nextEvent.getStartDate().getTime());
-                	newFrame.incActivityFre(nextActivityId);
-            		MainFrame.bigAnimationDerby.addFrame(newFrame);
-            	}
-        	}
-    		
-	        event = nextEvent;
-	    }
 
         MainFrame.bigAnimationDerby.merge();
     }
     
     //更新case集
     public void setCaseCollection() {
-        BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstEventID();
-        if (event == null) return;
-        BigEventDerby nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
-        while (event != null) {
-            event.setFirst();
-            BigCaseDerby newcase = new BigCaseDerby();
-            newcase.setCase(event.getCase());
-            newcase.addEvent(event);
-            newcase.addActivity(event.getActivity());
-            while(true){
-            	if(nextEvent == null){
-                    event.setLast();
-                    MainFrame.bigCaseCollectionDerby.addCase(newcase);
-                    MainFrame.bigCaseCollectionDerby.update();
-                    return;
-            	}
-                if(nextEvent.getCase().equals(newcase.getCase())){
-                	event = nextEvent;
-                	nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
-                    newcase.addEvent(event);
-                    newcase.addActivity(event.getActivity());
-                }else{
-                	break;
-                }
-            }
-            event.setLast();
-            MainFrame.bigCaseCollectionDerby.addCase(newcase);
-        	event = nextEvent;
-        	nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
-        }
+		int icount = 0;
+		long now;
+		try{
+			MainFrame.derbyConnection.setAutoCommit(false);
+			String sql = "insert into caseCollection values(?, ?, ?, ?, ?, ?, ?, ?, 0)";
+			PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+			String fisrtSql = "update eventCollection set firstInCase = true where UUID = ?";
+			PreparedStatement fisrtDerbyStatement = MainFrame.derbyConnection.prepareStatement(fisrtSql);
+			String lastSql = "update eventCollection set lastInCase = true where UUID = ?";
+			PreparedStatement lastDerbyStatement = MainFrame.derbyConnection.prepareStatement(lastSql);
+	        BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstEventID();
+	        if (event == null) return;
+	        BigEventDerby nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
+	        while (event != null) {
+				icount++;
+				if(icount % 10000 == 0){
+					derbyStatement.executeBatch();
+					fisrtDerbyStatement.executeBatch();
+					lastDerbyStatement.executeBatch();
+					MainFrame.derbyConnection.commit();
+					derbyStatement.clearBatch();
+					fisrtDerbyStatement.clearBatch();
+					lastDerbyStatement.clearBatch();
+					now=System.currentTimeMillis();
+					System.out.println("setCaseCollection"+(icount) +"："+(now)+"毫秒");
+				}
+	            event.setFirst(fisrtDerbyStatement);
+	            BigCaseDerby newcase = new BigCaseDerby();
+	            newcase.setCase(event.getCase());
+	            newcase.addEvent(event);
+	            newcase.addActivity(event.getActivity());
+	            while(true){
+	            	if(nextEvent == null){
+	                    event.setLast(lastDerbyStatement);
+	                    MainFrame.bigCaseCollectionDerby.addCase(newcase, derbyStatement);
+	        			derbyStatement.executeBatch();
+	        			fisrtDerbyStatement.executeBatch();
+	        			lastDerbyStatement.executeBatch();
+	        			MainFrame.derbyConnection.commit();
+	        	        if (derbyStatement != null)
+	        	        	derbyStatement.close();
+	        	        if (fisrtDerbyStatement != null)
+	        	        	fisrtDerbyStatement.close();
+	        	        if (lastDerbyStatement != null)
+	        	        	lastDerbyStatement.close();
+	            		MainFrame.derbyConnection.setAutoCommit(true);
+	                    
+	                    MainFrame.bigCaseCollectionDerby.update();
+	                    return;
+	            	}
+	                if(nextEvent.getCase().equals(newcase.getCase())){
+	        			icount++;
+	        			if(icount % 10000 == 0){
+	    					derbyStatement.executeBatch();
+	    					fisrtDerbyStatement.executeBatch();
+	    					lastDerbyStatement.executeBatch();
+	    					MainFrame.derbyConnection.commit();
+	    					derbyStatement.clearBatch();
+	    					fisrtDerbyStatement.clearBatch();
+	    					lastDerbyStatement.clearBatch();
+	        				now=System.currentTimeMillis();
+	        				System.out.println("setCaseCollection"+(icount) +"："+(now)+"毫秒");
+	        			}
+	                	event = nextEvent;
+	                	nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
+	                    newcase.addEvent(event);
+	                    newcase.addActivity(event.getActivity());
+	                }else{
+	                	break;
+	                }
+	            }
+	            event.setLast(lastDerbyStatement);
+	            MainFrame.bigCaseCollectionDerby.addCase(newcase, derbyStatement);
+	        	event = nextEvent;
+	        	nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
+	        }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
     }
        
     //更新variant集
     public void setVariantCollection() {
+		int icount = 0;
+		long now;
     	try {
-	        BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstCaseVariant();
+    		MainFrame.derbyConnection.setAutoCommit(false);
+    		String sql = "insert into variantCollection values(?, ?, ?, ?, ?)";
+    		PreparedStatement derbyStatement = MainFrame.derbyConnection.prepareStatement(sql);
+    		String caseSql = "update caseCollection set variantID = ? where caseID = ?";
+    		PreparedStatement caseDerbyStatement = MainFrame.derbyConnection.prepareStatement(caseSql);
+    		BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstCaseVariant();
 	        if (mycase == null) return;
 	        BigCaseDerby nextCase = MainFrame.bigCaseCollectionDerby.getNextCaseVariant();
 	        PreparedStatement preparedStatement = null;
 	        ResultSet resultSet = null;
-			String sql = "select * from caseCollection order by activitiesList, duration";
-			preparedStatement = MainFrame.derbyConnection.prepareStatement(sql);
+			String medianSql = "select * from caseCollection order by activitiesList, duration";
+			preparedStatement = MainFrame.derbyConnection.prepareStatement(medianSql);
 			resultSet = preparedStatement.executeQuery();
 	        BigCaseDerby medianCase = MainFrame.bigCaseCollectionDerby.getFirstCaseVariant(preparedStatement, resultSet);
 	        int medianCount = 0;
 	        int caseCount = 0;
 	        while(mycase != null){
+				icount++;
+				if(icount % 10000 == 0){
+					derbyStatement.executeBatch();
+					caseDerbyStatement.executeBatch();
+					MainFrame.derbyConnection.commit();
+					derbyStatement.clearBatch();
+					caseDerbyStatement.clearBatch();
+					now=System.currentTimeMillis();
+					System.out.println("setVariantCollection"+(icount) +"："+(now)+"毫秒");
+				}
 	            BigVariantDerby variant = new BigVariantDerby();
 	            variant.setVariant(MainFrame.bigVariantCollectionDerby.getSize()+1);
-	            variant.addCase(mycase);
+	            variant.addCase(mycase, caseDerbyStatement);
 	            variant.setActivities(mycase.getActivities());
 	            int count = 1;
 	            while(true)
@@ -876,16 +1070,34 @@ public class BigImportPanelDerby extends JPanel{
 	                	}else{
 	                		variant.setMedianDuration(medianCase.getDuration());
 	                	}
-	                    MainFrame.bigVariantCollectionDerby.addVariant(variant);
+	                    MainFrame.bigVariantCollectionDerby.addVariant(variant, derbyStatement);
 	                    while(medianCase != null)
 	                    	medianCase = MainFrame.bigCaseCollectionDerby.getNextCaseVariant(preparedStatement, resultSet);
+	        			derbyStatement.executeBatch();
+	        			caseDerbyStatement.executeBatch();
+	        			MainFrame.derbyConnection.commit();
+	        	        if (derbyStatement != null)
+	        	        	derbyStatement.close();
+	        	        if (caseDerbyStatement != null)
+	        	        	caseDerbyStatement.close();
+	            		MainFrame.derbyConnection.setAutoCommit(true);
 	                    return;
 	            	}
 	                if(variant.getActivities().equals(nextCase.getActivities())){
+	    				icount++;
+	    				if(icount % 10000 == 0){
+	    					derbyStatement.executeBatch();
+	    					caseDerbyStatement.executeBatch();
+	    					MainFrame.derbyConnection.commit();
+	    					derbyStatement.clearBatch();
+	    					caseDerbyStatement.clearBatch();
+	    					now=System.currentTimeMillis();
+	    					System.out.println("setVariantCollection"+(icount) +"："+(now)+"毫秒");
+	    				}
 	                	mycase = nextCase;
 	                	nextCase = MainFrame.bigCaseCollectionDerby.getNextCaseVariant();
 	                	caseCount++;
-	                	variant.addCase(mycase);
+	                	variant.addCase(mycase, caseDerbyStatement);
 	                	if(variant.getSize() > count * 2){
 	                		medianCase = MainFrame.bigCaseCollectionDerby.getNextCaseVariant(preparedStatement, resultSet);
 	                		medianCount++;
@@ -903,7 +1115,7 @@ public class BigImportPanelDerby extends JPanel{
 	        	}else{
 	        		variant.setMedianDuration(medianCase.getDuration());
 	        	}
-	            MainFrame.bigVariantCollectionDerby.addVariant(variant);
+	            MainFrame.bigVariantCollectionDerby.addVariant(variant, derbyStatement);
 	        	mycase = nextCase;
 	        	nextCase = MainFrame.bigCaseCollectionDerby.getNextCaseVariant();
 	        	caseCount++;
@@ -920,10 +1132,17 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新ActiveCasesOverTimeChart图表
     public void setActiveCasesOverTimeChart() {
+		int icount = 0;
+		long now;
         long start = 0;
         long end = 0;
         BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setActiveCasesOverTimeChart"+(icount) +"："+(now)+"毫秒");
+			}
             if(start > mycase.getStart().getTime() || start == 0)
             	start = mycase.getStart().getTime();
             if(end < mycase.getEnd().getTime())
@@ -932,7 +1151,13 @@ public class BigImportPanelDerby extends JPanel{
         }
         MainFrame.activeCasesOverTimeChart.init(start, end);
         mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
+        icount = 0;
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("2setActiveCasesOverTimeChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.activeCasesOverTimeChart.addActiveCasesOverTime(1, mycase.getStart());
             MainFrame.activeCasesOverTimeChart.addActiveCasesOverTime(-1, mycase.getEnd());
         	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
@@ -942,10 +1167,17 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新EventsOverTimeChart图表
     public void setEventsOverTimeChart() {
+		int icount = 0;
+		long now;
         long start = 0;
         long end = 0;
         BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirst();
         while(event != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setEventsOverTimeChart"+(icount) +"："+(now)+"毫秒");
+			}
             if(start > event.getStartDate().getTime() || start == 0)
             	start = event.getStartDate().getTime();
             if(end < event.getEndDate().getTime())
@@ -954,7 +1186,13 @@ public class BigImportPanelDerby extends JPanel{
         }
         MainFrame.eventsOverTimeChart.init(start, end);
         event = MainFrame.bigEventCollectionDerby.getFirst();
+        icount=0;
         while(event != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("2setEventsOverTimeChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.eventsOverTimeChart.addEventsOverTime(1, event.getStartDate());
             MainFrame.eventsOverTimeChart.addEventsOverTime(-1, event.getEndDate());
         	event = MainFrame.bigEventCollectionDerby.getNext();
@@ -964,8 +1202,15 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新EventsPerCaseChart图表
     public void setEventsPerCaseChart() {
+		int icount = 0;
+		long now;
         BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setEventsPerCaseChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.eventsPerCaseChart.addCases(mycase);
         	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
@@ -974,16 +1219,29 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新CaseDurationChart图表
     public void setCaseDurationChart() {
+		int icount = 0;
+		long now;
         long max = 0;
         BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setCaseDurationChart"+(icount) +"："+(now)+"毫秒");
+			}
             if(max < mycase.getDuration())
                 max = mycase.getDuration();
         	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
         MainFrame.caseDurationChart.setDuration(max / 100);
         mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
+        icount=0;
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("2setCaseDurationChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.caseDurationChart.addCases(mycase);
         	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
@@ -992,8 +1250,15 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新CaseUtilizationChart图表
     public void setCaseUtilizationChart() {
+		int icount = 0;
+		long now;
         BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setCaseUtilizationChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.caseUtilizationChart.addCases(mycase);
            	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
@@ -1002,16 +1267,29 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新MeanActivityDurationChart图表
     public void setMeanActivityDurationChart() {
+		int icount = 0;
+		long now;
         double max = 0;
         BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setMeanActivityDurationChart"+(icount) +"："+(now)+"毫秒");
+			}
             if(max < mycase.getMeanActiveTime())
                 max = mycase.getMeanActiveTime();
            	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
         MainFrame.meanActivityDurationChart.setDuration(max / 100);
         mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
+        icount = 0;
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("2setMeanActivityDurationChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.meanActivityDurationChart.addCases(mycase);
            	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
@@ -1020,16 +1298,29 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新MeanWaitingTimeChart图表
     public void setMeanWaitingTimeChart() {
+		int icount = 0;
+		long now;
         double max = 0;
         BigCaseDerby mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setMeanWaitingTimeChart"+(icount) +"："+(now)+"毫秒");
+			}
             if(max < mycase.getMeanWaitingTime())
                 max = mycase.getMeanWaitingTime();
            	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
         MainFrame.meanWaitingTimeChart.setDuration(max / 100);
         mycase = MainFrame.bigCaseCollectionDerby.getFirstID();
+        icount = 0;
         while(mycase != null){
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("2setMeanWaitingTimeChart"+(icount) +"："+(now)+"毫秒");
+			}
             MainFrame.meanWaitingTimeChart.addCases(mycase);
            	mycase = MainFrame.bigCaseCollectionDerby.getNextID();
         }
@@ -1038,9 +1329,16 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新activity集
     public void setActivityCollection() {
+		int icount = 0;
+		long now;
         BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstActivity();
         BigEventDerby nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
         while (event != null) {
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setActivityCollection"+(icount) +"："+(now)+"毫秒");
+			}
             Activity activity = new Activity();
             activity.setActivity(event.getActivity());
             if(event.getFirst())
@@ -1059,6 +1357,11 @@ public class BigImportPanelDerby extends JPanel{
                     break;
                 if(nextEvent.getActivity().equals(activity.getActivity()))
                 {
+        			icount++;
+        			if(icount % 10000 == 0){
+        				now=System.currentTimeMillis();
+        				System.out.println("setActivityCollection"+(icount) +"："+(now)+"毫秒");
+        			}
                     if(nextEvent.getFirst())
                     {
                         activity.setFirst();
@@ -1094,9 +1397,16 @@ public class BigImportPanelDerby extends JPanel{
     
     //更新resource集
     public void setResourceCollection() {
+		int icount = 0;
+		long now;
         BigEventDerby event = MainFrame.bigEventCollectionDerby.getFirstResource();
         BigEventDerby nextEvent = MainFrame.bigEventCollectionDerby.getNextEventID();
         while (event != null) {
+			icount++;
+			if(icount % 10000 == 0){
+				now=System.currentTimeMillis();
+				System.out.println("setResourceCollection"+(icount) +"："+(now)+"毫秒");
+			}
             Resource resource = new Resource();
             resource.setResource(event.getResource());
             if(event.getFirst())
@@ -1115,6 +1425,11 @@ public class BigImportPanelDerby extends JPanel{
                     break;
                 if(nextEvent.getResource().equals(resource.getResource()))
                 {
+        			icount++;
+        			if(icount % 10000 == 0){
+        				now=System.currentTimeMillis();
+        				System.out.println("setResourceCollection"+(icount) +"："+(now)+"毫秒");
+        			}
                     if(nextEvent.getFirst())
                     {
                         resource.setFirst();
